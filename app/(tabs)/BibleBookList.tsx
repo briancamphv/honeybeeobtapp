@@ -27,7 +27,7 @@ const BibleBookList: React.FC = () => {
   return (
     <View>
       <Appbar.Header>
-        <Appbar.Content title={t("Template")} />
+        <Appbar.Content title={t("Templates")} />
       </Appbar.Header>
 
       <ScrollView showsVerticalScrollIndicator={false}>

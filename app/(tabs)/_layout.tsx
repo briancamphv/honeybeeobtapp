@@ -3,7 +3,6 @@ import { Drawer } from "expo-router/drawer";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
-import { Button } from "react-native-paper";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -30,6 +29,8 @@ const DrawerLayout = () => {
     },
   };
 
+  const { t } = useTranslation();
+
   return (
     <I18nextProvider i18n={i18n}>
       <PaperProvider theme={theme}>
@@ -38,7 +39,7 @@ const DrawerLayout = () => {
             <Drawer.Screen
               name="index"
               options={{
-                drawerLabel: "Home",
+                drawerLabel: t("Home"),
                 headerTitle: "Home",
                 drawerIcon: ({ size, color }) => (
                   <Ionicons name="home" size={size} color={color} />
@@ -48,8 +49,9 @@ const DrawerLayout = () => {
             <Drawer.Screen
               name="BibleBookList"
               options={{
-                drawerLabel: "Templates",
+                drawerLabel: t("Templates"),
                 headerTitle: "Templates",
+                // headerShown: false,
                 headerRight: () => (
                   <Ionicons
                     size={20}
@@ -65,8 +67,9 @@ const DrawerLayout = () => {
             <Drawer.Screen
               name="TranslateAndRevise"
               options={{
-                drawerLabel: "Translate+Revise",
+                drawerLabel: t("Translate+Revise"),
                 headerTitle: "Translate+Revise",
+                headerShown: false,
                 headerRight: () => (
                   <Ionicons
                     size={20}

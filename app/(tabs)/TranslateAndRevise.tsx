@@ -7,6 +7,7 @@ import Menu from "@/components/HBAppBar";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "expo-router";
 import HBAppBar from "@/components/HBAppBar";
+import HBScriptureCard from "@/components/HBScriptureCard";
 
 const TranslateAndRevise: React.FC = () => {
   function handleCardPress(item: string) {
@@ -28,7 +29,8 @@ const TranslateAndRevise: React.FC = () => {
 
   return (
     <View>
-      <HBAppBar navigation={navigation} />
+      <HBAppBar/>
+      <HBScriptureCard/>
     </View>
   );
 };
