@@ -5,7 +5,7 @@ import { Link } from "expo-router";
 
 import { useTranslation } from "react-i18next";
 
-import { booksOfBible } from "../data/BooksOfBible";
+import booksOfBible from "../data/BooksOfBible";
 
 const BibleBookList: React.FC = () => {
   function handleCardPress(item: string) {

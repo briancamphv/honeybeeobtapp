@@ -1,6 +1,8 @@
 import React from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
-import { Card, Title, Appbar } from "react-native-paper";
+import { Card, Title, Text } from "react-native-paper";
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable'
+import { TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
 import Menu from "@/components/HBAppBar";
 
@@ -8,6 +10,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigation } from "expo-router";
 import HBAppBar from "@/components/HBAppBar";
 import HBScriptureCard from "@/components/HBScriptureCard";
+
+
 
 const TranslateAndRevise: React.FC = () => {
   function handleCardPress(item: string) {
@@ -28,10 +32,18 @@ const TranslateAndRevise: React.FC = () => {
   );
 
   return (
+    <Swipeable
+      renderRightActions={() => (
+        <TouchableOpacity style={{flex:1}} onPress={() => console.log("swipe")}>
+          <Text>Next Screen</Text>
+        </TouchableOpacity>
+      )}
+    >
     <View>
       <HBAppBar/>
       <HBScriptureCard/>
     </View>
+    </Swipeable>
   );
 };
 

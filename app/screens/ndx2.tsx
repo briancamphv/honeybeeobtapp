@@ -17,8 +17,8 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../translate/i18n";
 import { useTranslation } from 'react-i18next';
 
-import Login from "../screens/login";
-import BibleBookList from "../screens/booksofbible";
+import Login from "./login";
+import BibleBookList from "./booksofbible";
 
 
 export default function HomeScreen() {

@@ -1,4 +1,4 @@
-export const booksOfBible: string[] =  [
+const booksOfBible: string[] =  [
   "Genesis",
   "Exodus",
   "Leviticus",
@@ -66,3 +66,5 @@ export const booksOfBible: string[] =  [
   "Jude",
   "Revelation",
 ];
+ 
+export default booksOfBible;

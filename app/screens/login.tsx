@@ -16,7 +16,7 @@ import { useState } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 
-export default function Login() {
+const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -155,3 +155,5 @@ const styles = StyleSheet.create({
   },
   button: {},
 });
+
+export default Login;

@@ -1,9 +1,10 @@
 import "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
-import { Tabs } from "expo-router";
+import { Tabs, useNavigation } from "expo-router";
 import React from "react";
+import { Text } from "react-native-paper";
 import { Platform } from "react-native";
-
+  
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
@@ -11,7 +12,7 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
-import {
+import {  
   MD3LightTheme as DefaultTheme,
   PaperProvider,
 } from "react-native-paper";
@@ -19,25 +20,28 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../translate/i18n";
 import { useTranslation } from "react-i18next";
 
+
+ 
 const DrawerLayout = () => {
   const theme = {
     ...DefaultTheme,
+  
     colors: {
       ...DefaultTheme.colors,
-      primary: "tomato",
+      primary: "tomato", 
       secondary: "yellow",
     },
   };
 
-  const { t } = useTranslation();
+  const { t } = useTranslation(); 
 
   return (
     <I18nextProvider i18n={i18n}>
       <PaperProvider theme={theme}>
-        <GestureHandlerRootView>
+        <GestureHandlerRootView style={{ flex: 1 }}>
           <Drawer>
             <Drawer.Screen
-              name="index"
+              name="index"  
               options={{
                 drawerLabel: t("Home"),
                 headerTitle: "Home",
@@ -50,15 +54,6 @@ const DrawerLayout = () => {
               name="BibleBookList"
               options={{
                 drawerLabel: t("Templates"),
-                headerTitle: "Templates",
-                // headerShown: false,
-                headerRight: () => (
-                  <Ionicons
-                    size={20}
-                    onPress={() => alert("This is a button!")}
-                    name="help"
-                  />
-                ),
                 drawerIcon: ({ size, color }) => (
                   <Ionicons name="folder" size={size} color={color} />
                 ),
@@ -67,21 +62,14 @@ const DrawerLayout = () => {
             <Drawer.Screen
               name="TranslateAndRevise"
               options={{
-                drawerLabel: t("Translate+Revise"),
-                headerTitle: "Translate+Revise",
                 headerShown: false,
-                headerRight: () => (
-                  <Ionicons
-                    size={20}
-                    onPress={() => alert("This is a button!")}
-                    name="help"
-                  />
-                ),
+                drawerLabel: t("Translate+Revise"),
                 drawerIcon: ({ size, color }) => (
                   <Ionicons name="language" size={size} color={color} />
                 ),
               }}
             />
+            <Text>Test</Text>
           </Drawer>
         </GestureHandlerRootView>
       </PaperProvider>
