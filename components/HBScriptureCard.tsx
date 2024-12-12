@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { StyleProp, StyleSheet, View } from "react-native";
 
-import { Card, Button, Text, Avatar } from "react-native-paper";
+import { Card, Text, Avatar } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 import { ThemeProp } from "react-native-paper/lib/typescript/types";
@@ -30,7 +30,7 @@ const HBScriptureCard: React.FC = () => {
       <Card>
  
         <Card.Cover source={{ uri: "https://fastly.picsum.photos/id/572/700/700.jpg?hmac=2MQKX0qSjDAkngeeebCoPsLnBFXWXZZi627l0BkFqfw" }} />
-        <Button>Ok</Button>
+       
         <Card.Content>
           <Text variant="titleLarge">Jonah 1:1-2</Text>
           <Text variant="bodyMedium">
@@ -40,10 +40,6 @@ const HBScriptureCard: React.FC = () => {
             that I am planning to destroy their city because of their sins.”
           </Text>
         </Card.Content>
-        <Card.Actions>
-          <Button>Cancel</Button>
-          <Button>Ok</Button>
-        </Card.Actions>
       </Card>
     </>
   );

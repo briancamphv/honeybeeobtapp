@@ -1,10 +1,9 @@
-import "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
 import { Tabs, useNavigation } from "expo-router";
 import React from "react";
-import { Text } from "react-native-paper";
+import { Text } from "react-native-paper";  
 import { Platform } from "react-native";
-  
+     
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
@@ -14,13 +13,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import {  
   MD3LightTheme as DefaultTheme,
-  PaperProvider,
+  PaperProvider, 
 } from "react-native-paper";
 import { I18nextProvider } from "react-i18next";
 import i18n from "../translate/i18n";
 import { useTranslation } from "react-i18next";
-
-
+console.log("layout");
  
 const DrawerLayout = () => {
   const theme = {
@@ -38,6 +36,8 @@ const DrawerLayout = () => {
   return (
     <I18nextProvider i18n={i18n}>
       <PaperProvider theme={theme}>
+
+        
         <GestureHandlerRootView style={{ flex: 1 }}>
           <Drawer>
             <Drawer.Screen
@@ -69,11 +69,10 @@ const DrawerLayout = () => {
                 ),
               }}
             />
-            <Text>Test</Text>
           </Drawer>
         </GestureHandlerRootView>
       </PaperProvider>
-    </I18nextProvider>
+    </I18nextProvider> 
   );
 };
 
