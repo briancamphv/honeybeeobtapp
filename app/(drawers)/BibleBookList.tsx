@@ -2,6 +2,7 @@ import React from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 import { Card, Title, Appbar } from "react-native-paper";
 import { Link } from "expo-router";
+import CreateRNFSFolder from "@/components/createRNFSFolder";
 
 import { useTranslation } from "react-i18next";
 
@@ -15,7 +16,7 @@ const BibleBookList: React.FC = () => {
   const { t } = useTranslation();
 
   const renderItem = (item: string) => (
-    <Card style={styles.card} onPress={() => handleCardPress(item)}>
+    <Card key={Math.random()} style={styles.card} onPress={() => handleCardPress(item)}>
       <Card.Content>
         <Title numberOfLines={2} style={styles.title}>
           {t(item)}
