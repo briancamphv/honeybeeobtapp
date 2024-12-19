@@ -10,6 +10,7 @@ import { Platform } from "react-native";
 import createFolder from "@/components/CreateWorkSpace";
 import GetTemplate from "@/components/DocumentPicker";
 import React from "react";
+import SoundTest from "@/components/SoundTest";
 
 const isPhone = Platform.OS === "ios" || Platform.OS === "android";
 const isTablet = Platform.OS === "ios" && Platform.OS !== "ios";
@@ -47,6 +48,7 @@ const Index: React.FC = () => {
       <Button onPress={onToggle}>Press Me</Button>
       <Button onPress={onNavigate}>Translate+Revise</Button>
       <Button onPress={buildFolder}>Create Work Folder</Button>
+
 
       <GetTemplate/>
 

@@ -25,7 +25,7 @@ const GetTemplate: React.FC = () => {
     console.log("complete")
     
     const fileUri = FileSystem.documentDirectory + selectedFile!.name;
-    const dest = fileUri.split(".bloom")
+    const dest = fileUri.split(".zip")
     const dest2 = `${FileSystem.documentDirectory}`
 
     if (await fileExists(fileUri)) {
@@ -33,8 +33,9 @@ const GetTemplate: React.FC = () => {
         console.log("fileExists in FileCopyComplete")
 
         unzipFile(fileUri, dest2);
-        listFiles(dest2);
-        listFiles(dest2 + "audio/");
+        listFiles(dest2+ "/Jonah 1-2 2/audioVisual/");
+      
+    
 
 
     }
@@ -59,7 +60,8 @@ const GetTemplate: React.FC = () => {
   const handleFileSelect = async () => {
     try {
       const result: any = await DocumentPicker.getDocumentAsync({
-        type: "application/octet-stream", // You can specify file types here
+        // type: "application/octet-stream", // You can specify file types here
+        type: "*/*", // You can specify file types here
       });
 
       if (!result.assets[0].canceled) {
