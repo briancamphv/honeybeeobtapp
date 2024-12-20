@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 import { Card, Title, Text } from "react-native-paper";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -21,6 +21,36 @@ import HBRecordBar from "@/components/HBRecordBar";
 import * as FileSystem from "expo-file-system";
 
 const TranslateAndRevise: React.FC = () => {
+
+  useEffect(() => {
+  
+    loadTemplate("Jonah 1-2 2").then((json) => {
+   
+      setAudioURI(
+        FileSystem.documentDirectory +
+          template +
+          "/audioVisual/" +
+          json.passages[1].audio
+      );
+  
+      setImageURI(
+        FileSystem.documentDirectory +
+          template +
+          "/audioVisual/" +
+          json.passages[1].image
+      );
+  
+      setPassageText(json.passages[1].text);
+      setTitle(json.passages[1].book + " " +  json.passages[1].chapter + ": " + json.passages[1].verses)
+  
+      if (json.passages[1].notes) {
+        setNotes(json.passages[1].notes)
+      }
+      
+    });
+
+    }, []); // Empty dependency array
+
   function handleCardPress(item: string) {
     console.log("item pressed", item);
   }
@@ -28,46 +58,20 @@ const TranslateAndRevise: React.FC = () => {
   const [audioURI, setAudioURI] = useState<string>("");
   const [imageURI, setImageURI] = useState<string>("");
   const [passageText, setPassageText] = useState<string>("");
+  const [notes, setNotes] = useState<any[]>([]);
   const [title, setTitle] = useState<string>("");
   const navigation = useNavigation();
   const { t } = useTranslation();
 
   var template = "Jonah 1-2 2";
 
-  loadTemplate("Jonah 1-2 2").then((json) => {
-    setAudioURI(
-      FileSystem.documentDirectory +
-        template +
-        "/audioVisual/" +
-        json.passages[1].audio
-    );
+  
 
-    setImageURI(
-      FileSystem.documentDirectory +
-        template +
-        "/audioVisual/" +
-        json.passages[1].image
-    );
+  // listFiles(FileSystem.documentDirectory + template + "/audioVisual/");
+  // fileExists(
+  //   "file:///data/user/0/com.briancamphv.HoneyBeeOBTApp/files/Jonah 1-2 2/audioVisual/Jona 1 3.mp3"
+  // ).then((val) => console.log(val));
 
-    setPassageText(json.passages[1].text);
-    setTitle(json.passages[1].book + " " +  json.passages[1].chapter + ": " + json.passages[1].verses)
-  });
-
-  listFiles(FileSystem.documentDirectory + template + "/audioVisual/");
-  fileExists(
-    "file:///data/user/0/com.briancamphv.HoneyBeeOBTApp/files/Jonah 1-2 2/audioVisual/Jona 1 3.mp3"
-  ).then((val) => console.log(val));
-
-
-  const renderItem = (item: string) => (
-    <Card style={styles.card} onPress={() => handleCardPress(item)}>
-      <Card.Content>
-        <Title numberOfLines={2} style={styles.title}>
-          {t(item)}
-        </Title>
-      </Card.Content>
-    </Card>
-  );
 
   return (
     <Swipeable
@@ -82,12 +86,11 @@ const TranslateAndRevise: React.FC = () => {
     >
       <View>
         <HBAppBar />
-        <HBScriptureCard imageURI={imageURI} passageText={passageText} title={title} />
-        {/* <HBAudioPlayer audioUri="https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav" /> */}
+        <HBScriptureCard imageURI={imageURI} passageText={passageText} title={title} notes={notes} />
         <AudioPlayer audioUri={audioURI} />
         <HBRecordBar />
       </View>
-    </Swipeable>
+   </Swipeable>
   );
 };
 

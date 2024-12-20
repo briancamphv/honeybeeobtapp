@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Slider from "@react-native-community/slider";
 import { Icon, MD3Colors } from "react-native-paper"; // Adjust this import according to your UI component needs
+
+const audioRecorderPlayer = new AudioRecorderPlayer();
 
 import AudioRecorderPlayer, {
   PlayBackType,
@@ -11,14 +13,9 @@ interface AudioPlayerProps {
   audioUri: string;
 }
 
-const audioRecorderPlayer = new AudioRecorderPlayer();
-
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
+ 
 
-  console.log("audioUri")
-
-  const playURI = audioUri
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playing, setPlaying] = useState<boolean>(false);
@@ -36,7 +33,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   );
 
   const onPlaybackStatusUpdate = (status: PlayBackType) => {
-    console.log("test")
+    
     setDuration(status.duration || 0);
     setCurrentPosition(status.currentPosition || 0);
 
@@ -48,7 +45,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   };
 
   const onStartPlay = async () => {
-    const msg = await audioRecorderPlayer.startPlayer(playURI);
+    const msg = await audioRecorderPlayer.startPlayer(audioUri);
   };
 
   const onPausePlay = async () => {
