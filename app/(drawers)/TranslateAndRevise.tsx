@@ -1,110 +1,135 @@
 import React from "react";
-import { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import { Card, Title, Text } from "react-native-paper";
-import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import { TouchableOpacity } from "react-native";
-import { Link } from "expo-router";
-import Menu from "@/components/HBAppBar";
-import loadTemplate from "@/helpers/LoadTemplate";
-import listFiles from "@/helpers/ListFiles";
-import fileExists from "@/helpers/FileExists";
+import { useEffect, useRef } from "react";
+
+import { useAppContext } from "@/context/AppContext";
+
+import { View, StyleSheet } from "react-native";
 
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "expo-router";
 import HBAppBar from "@/components/HBAppBar";
 import HBScriptureCard from "@/components/HBScriptureCard";
-//import HBAudioPlayer from "@/components/HBAudioPlayer";
+// import HBAudioPlayer from "@/components/HBAudioPlayer";
 import AudioPlayer from "@/components/HBAudioPlayer";
 import HBRecordBar from "@/components/HBRecordBar";
 
-import * as FileSystem from "expo-file-system";
+import {
+  GestureHandlerRootView,
+  GestureDetector,
+  Gesture,
+} from "react-native-gesture-handler";
 
 const TranslateAndRevise: React.FC = () => {
+  
+
+  const {
+    loadTemplate,
+    incrementPageNumber,
+    decrementPageNumber,
+    imageURI,
+    audioURI,
+    passageText,
+    title,
+    notes,
+    templatePassages,
+  } = useAppContext();
 
   useEffect(() => {
-  
-    loadTemplate("Jonah 1-2 2").then((json) => {
-   
-      setAudioURI(
-        FileSystem.documentDirectory +
-          template +
-          "/audioVisual/" +
-          json.passages[1].audio
-      );
-  
-      setImageURI(
-        FileSystem.documentDirectory +
-          template +
-          "/audioVisual/" +
-          json.passages[1].image
-      );
-  
-      setPassageText(json.passages[1].text);
-      setTitle(json.passages[1].book + " " +  json.passages[1].chapter + ": " + json.passages[1].verses)
-  
-      if (json.passages[1].notes) {
-        setNotes(json.passages[1].notes)
-      }
-      
-    });
-
-    }, []); // Empty dependency array
+    loadTemplate("Jonah 1-2 2");
+  }, []); // Empty dependency array
 
   function handleCardPress(item: string) {
     console.log("item pressed", item);
   }
 
-  const [audioURI, setAudioURI] = useState<string>("");
-  const [imageURI, setImageURI] = useState<string>("");
-  const [passageText, setPassageText] = useState<string>("");
-  const [notes, setNotes] = useState<any[]>([]);
-  const [title, setTitle] = useState<string>("");
   const navigation = useNavigation();
   const { t } = useTranslation();
 
   var template = "Jonah 1-2 2";
-
-  
 
   // listFiles(FileSystem.documentDirectory + template + "/audioVisual/");
   // fileExists(
   //   "file:///data/user/0/com.briancamphv.HoneyBeeOBTApp/files/Jonah 1-2 2/audioVisual/Jona 1 3.mp3"
   // ).then((val) => console.log(val));
 
+  const onSwiped = (direction: string) => {
+    console.log("swiped", direction);
+
+    if (direction === "right") {
+      console.log("swipedincrement", direction);
+
+      incrementPageNumber();
+    }
+
+    if (direction === "left") {
+      console.log("swipeddecrement", direction);
+
+      decrementPageNumber();
+    }
+  };
+
+  const onSwipe = (event: any) => {
+  
+    if (event.translationX < 0) {
+      // Swipe right
+      incrementPageNumber();
+      console.log("Swiped right!");
+    } else {
+      // Swipe left
+      console.log("Swiped left!");
+      decrementPageNumber();
+    }
+  };
 
   return (
-    <Swipeable
-      renderRightActions={() => (
-        <TouchableOpacity
-          style={{ flex: 1 }}
-          onPress={() => console.log("swipe")}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureDetector gesture={Gesture.Pan().onEnd(onSwipe)}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Text>Next Screen</Text>
-        </TouchableOpacity>
-      )}
-    >
-      <View>
-        <HBAppBar />
-        <HBScriptureCard imageURI={imageURI} passageText={passageText} title={title} notes={notes} />
-        <AudioPlayer audioUri={audioURI} />
-        <HBRecordBar />
-      </View>
-   </Swipeable>
+          <HBAppBar />
+          <HBScriptureCard
+            imageURI={imageURI}
+            passageText={passageText}
+            title={title}
+            notes={notes}
+          />
+          <AudioPlayer audioUri={audioURI}/>
+          <HBRecordBar />
+        </View>
+      </GestureDetector>
+    </GestureHandlerRootView>
   );
 };
 
 export default TranslateAndRevise;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   card: {
-    width: 120, // Adjust the width as needed
-    height: 80, // Adjust the height as needed
+    flex: 1,
     margin: 2,
     borderRadius: 10,
   },
   title: {
     fontSize: 13,
     fontWeight: "bold",
+  },
+  item: {
+    width: 300,
+    height: 100,
+    backgroundColor: "#f0f",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  rightAction: {
+    flex: 1,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    animationDuration: "0s",
   },
 });

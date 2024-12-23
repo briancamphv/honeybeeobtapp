@@ -41,7 +41,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   const closeWordDialog = () => setWordDialogVisible(false);
 
   useEffect(() => {
-    if (notes === null) {
+    if (notes === null || notes === undefined ) {
       return;
     }
 

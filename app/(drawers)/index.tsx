@@ -4,13 +4,12 @@ import { View, Text } from "react-native";
 import { Button } from "react-native-paper";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
-import downloadFile from "@/components/DownloadFile";
-import downloadFileWeb from "@/components/DownloadFileWeb";
 import { Platform } from "react-native";
 import createFolder from "@/components/CreateWorkSpace";
 import GetTemplate from "@/components/DocumentPicker";
 import React from "react";
 import SoundTest from "@/components/SoundTest";
+import { useAppContext } from "@/context/AppContext";
 
 const isPhone = Platform.OS === "ios" || Platform.OS === "android";
 const isTablet = Platform.OS === "ios" && Platform.OS !== "ios";
@@ -20,6 +19,8 @@ console.log("index");
 
 const Index: React.FC = () => {
   const navigation = useNavigation();
+
+  const { count, increment, decrement, loadTemplate } = useAppContext();
 
   const onToggle = () => {
     navigation.dispatch(DrawerActions.openDrawer());
@@ -32,15 +33,11 @@ const Index: React.FC = () => {
   if (isWeb) {
   } else {
   }
-  downloadFile(
-    "https://drive.google.com/file/d/10KUzpyq2_IFmwlbKazgxo5uvlkFn5QtT/view?usp=drive_link",
-    "Jon 1 1-2.mp3"
-  );
+ 
 
   function buildFolder() {
     createFolder("honeybee_work2");
   }
-  
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -49,9 +46,21 @@ const Index: React.FC = () => {
       <Button onPress={onNavigate}>Translate+Revise</Button>
       <Button onPress={buildFolder}>Create Work Folder</Button>
 
+      <GetTemplate />
 
-      <GetTemplate/>
-
+      <View>
+        <Text>Count: {count}</Text>
+        <Button onPress={increment}>Increment</Button>
+        <Button onPress={decrement}>Decrement</Button>
+        <Button onPress={decrement}>Decrement</Button>
+        <Button
+          onPress={() => {
+            loadTemplate("Jonah 1-2 2");
+          }}
+        >
+          Load Template
+        </Button>
+      </View>
     </View>
   );
 };
