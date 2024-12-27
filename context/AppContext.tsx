@@ -1,7 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
+import {useAssets} from 'expo-asset';
+
+
 
 // Define the type for the context values
+
+interface WordNote {
+  altFormSym: string;
+  otherLangEx: string;
+  meaning: string;
+  relatedTerms: string;
+}
+
 interface AppContextType {
   count: number;
   increment: () => void;
@@ -11,6 +22,7 @@ interface AppContextType {
   decrementPageNumber: () => void;
   enableAudio: () => void;
   disableAudio: () => void;
+  template: string;
   audioStop: boolean;
   audioURI: string;
   imageURI: string;
@@ -18,6 +30,7 @@ interface AppContextType {
   notes: any;
   title: string;
   templatePassages: any[];
+  wordData: Map<string, WordNote>,
 }
 
 // Create the context
@@ -35,7 +48,9 @@ const useAppContext = () => {
 };
 
 // Create the provider component
-const AppProvider: React.FC = ({ children }) => {
+const AppProvider: React.FC<{ children: React.ReactElement }> = ({
+  children,
+}) => {
   const [count, setCount] = useState(0);
 
   const [audioURI, setAudioURI] = useState<string>("");
@@ -50,6 +65,53 @@ const AppProvider: React.FC = ({ children }) => {
 
   const [templateJSON, setTemplateJSON] = useState<any>({});
   const [templatePassages, setTemplatePassages] = useState<any>([]);
+
+  const [wordData, setWordData] = useState<Map<string, WordNote>>(new Map());
+   
+  const [assets, error] = useAssets(require('../assets/data/wordlinks.csv'))
+ 
+
+  useEffect(() => {
+ 
+
+    if (assets === undefined) {return}
+    
+    const fetchData = async () => {
+     
+      try {
+       
+        const fileContent = await FileSystem.readAsStringAsync(assets![0].localUri!);
+        const lines = fileContent.split('\r\n');
+
+        // skip header line
+        const dataLines = lines.slice(1);
+        const wordMap = new Map();
+
+        dataLines.map( line => {
+          var fields = line.split('\t')
+          var JSON = {
+            "altFormSym": fields[2],
+            "otherLangEx": fields[3],
+            "meaning": fields[4],
+            "relatedTerms": fields[5],
+          }
+
+          wordMap.set(fields[1],JSON)
+
+        })
+         
+        setWordData(wordMap)
+
+
+
+      } catch (error) {
+        console.error('Error reading CSV file:', error);
+      }
+    };
+
+   
+    fetchData();
+  },[assets])
 
   useEffect(() => {
     if (Object.keys(templateJSON).length === 0) {
@@ -81,11 +143,12 @@ const AppProvider: React.FC = ({ children }) => {
   }, [pageNumber]); // Empty dependency array
 
   useEffect(() => {
+ 
     loadTemplate("Jonah 1-2 2");
   }, []);
 
   function incrementPageNumber() {
-    disableAudio()
+    disableAudio();
     if (pageNumber === templatePassages.length - 1) {
       setPageNumber(0);
     } else {
@@ -94,7 +157,7 @@ const AppProvider: React.FC = ({ children }) => {
   }
 
   function decrementPageNumber() {
-    disableAudio()
+    disableAudio();
     if (pageNumber === 0) {
       setPageNumber(templatePassages.length - 1);
     } else {
@@ -164,6 +227,8 @@ const AppProvider: React.FC = ({ children }) => {
     setAudioStop(false);
   };
 
+
+
   return (
     <AppContext.Provider
       value={{
@@ -175,6 +240,8 @@ const AppProvider: React.FC = ({ children }) => {
         notes,
         templatePassages,
         audioStop,
+        template,
+        wordData,
         increment,
         decrement,
         loadTemplate,

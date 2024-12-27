@@ -18,18 +18,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   const { enableAudio, audioStop } = useAppContext();
 
   useEffect(() => {
-
     if (audioStop) {
-
-      onStopPlay()
+      onStopPlay();
       setAudioLoaded(false);
       setPlaying(false);
       setCurrentPosition(0);
-      
-      enableAudio();
 
+      enableAudio();
     }
-    
   }, [audioStop]);
 
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -92,13 +88,15 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
 
   return (
     <View style={{ padding: "10", flexDirection: "row", width: "90%" }}>
-      <TouchableOpacity disabled={!audioRecorderPlayer} onPress={onPlayPause}>
-        <Icon
-          source={playing ? "pause" : "play"}
-          color={MD3Colors.error50}
-          size={35}
-        />
-      </TouchableOpacity>
+      
+        <TouchableOpacity disabled={!audioRecorderPlayer} onPress={onPlayPause}>
+          <Icon
+            source={playing ? "pause" : "play"}
+            color={MD3Colors.error50}
+            size={35}
+          />
+        </TouchableOpacity>
+     
 
       <Slider
         style={{ width: "100%", height: 40 }}
