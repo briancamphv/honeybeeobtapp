@@ -52,7 +52,7 @@ const DrawerLayout = () => {
                 }}
               />
               <Drawer.Screen
-                name="BibleBookList"
+                name="Templates"
                 options={{
                   drawerLabel: t("Templates"),
                   drawerIcon: ({ size, color }) => (

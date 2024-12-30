@@ -4,18 +4,18 @@ import Slider from "@react-native-community/slider";
 import { Icon, MD3Colors } from "react-native-paper"; // Adjust this import according to your UI component needs
 import { useAppContext } from "@/context/AppContext";
 
-const audioRecorderPlayer = new AudioRecorderPlayer();
-
 import AudioRecorderPlayer, {
   PlayBackType,
 } from "react-native-audio-recorder-player";
+
+const audioPlayer = new AudioRecorderPlayer();
 
 interface AudioPlayerProps {
   audioUri: string;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
-  const { enableAudio, audioStop } = useAppContext();
+  const { enableAudio, audioStop, playRecording } = useAppContext();
 
   useEffect(() => {
     if (audioStop) {
@@ -36,15 +36,17 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   const handleSliderValueChange = async (value: number) => {
     if (audioLoaded) {
       setPlaying(false);
-      await audioRecorderPlayer.seekToPlayer(value);
+      await audioPlayer.seekToPlayer(value);
     }
   };
 
-  audioRecorderPlayer.addPlayBackListener((status) =>
-    onPlaybackStatusUpdate(status)
-  );
+  audioPlayer.addPlayBackListener((status) => onPlaybackStatusUpdate(status));
 
   const onPlaybackStatusUpdate = (status: PlayBackType) => {
+    if (playRecording) {
+      return;
+    }
+
     setDuration(status.duration || 0);
     setCurrentPosition(status.currentPosition || 0);
 
@@ -56,19 +58,19 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   };
 
   const onStartPlay = async () => {
-    const msg = await audioRecorderPlayer.startPlayer(audioUri);
+    const msg = await audioPlayer.startPlayer(audioUri);
   };
 
   const onPausePlay = async () => {
-    await audioRecorderPlayer.pausePlayer();
+    await audioPlayer.pausePlayer();
   };
 
   const onResumePlay = async () => {
-    await audioRecorderPlayer.resumePlayer();
+    await audioPlayer.resumePlayer();
   };
 
   const onStopPlay = async () => {
-    await audioRecorderPlayer.stopPlayer();
+    await audioPlayer.stopPlayer();
   };
 
   const onPlayPause = async () => {
@@ -87,16 +89,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   };
 
   return (
-    <View style={{ padding: "10", flexDirection: "row", width: "90%" }}>
-      
-        <TouchableOpacity disabled={!audioRecorderPlayer} onPress={onPlayPause}>
-          <Icon
-            source={playing ? "pause" : "play"}
-            color={MD3Colors.error50}
-            size={35}
-          />
-        </TouchableOpacity>
-     
+    <View style={{ padding: 10, flexDirection: "row", width: "90%" }}>
+      <TouchableOpacity disabled={!audioPlayer} onPress={onPlayPause}>
+        <Icon
+          source={playing ? "pause" : "play"}
+          color={MD3Colors.error50}
+          size={35}
+        />
+      </TouchableOpacity>
 
       <Slider
         style={{ width: "100%", height: 40 }}
@@ -105,7 +105,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
         value={currentPosition || 0}
         onSlidingComplete={handleSliderValueChange}
         onSlidingStart={onPausePlay}
-        disabled={!audioRecorderPlayer}
+        disabled={!audioPlayer}
       />
     </View>
   );

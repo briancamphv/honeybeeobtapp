@@ -19,11 +19,14 @@ import {
   Gesture,
 } from "react-native-gesture-handler";
 
-const TranslateAndRevise: React.FC = () => {
-  
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 
+const TranslateAndRevise: React.FC = () => {
   const {
-    loadTemplate,
     incrementPageNumber,
     decrementPageNumber,
     imageURI,
@@ -31,61 +34,62 @@ const TranslateAndRevise: React.FC = () => {
     passageText,
     title,
     notes,
-    templatePassages,
   } = useAppContext();
 
-  useEffect(() => {
-    loadTemplate("Jonah 1-2 2");
-  }, []); // Empty dependency array
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
 
-  function handleCardPress(item: string) {
-    console.log("item pressed", item);
-  }
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value },
+      ],
+    };
+  });
+
+  const onGestureEvent = (event: any) => {
+   
+    // console.log("event",event)
+    translateX.value = withSpring(event.translationX);
+    //translateY.value = withSpring(event.translationY);
+  };
 
   const navigation = useNavigation();
   const { t } = useTranslation();
-
-  var template = "Jonah 1-2 2";
 
   // listFiles(FileSystem.documentDirectory + template + "/audioVisual/");
   // fileExists(
   //   "file:///data/user/0/com.briancamphv.HoneyBeeOBTApp/files/Jonah 1-2 2/audioVisual/Jona 1 3.mp3"
   // ).then((val) => console.log(val));
 
-  const onSwiped = (direction: string) => {
-    console.log("swiped", direction);
-
-    if (direction === "right") {
-      console.log("swipedincrement", direction);
-
-      incrementPageNumber();
-    }
-
-    if (direction === "left") {
-      console.log("swipeddecrement", direction);
-
-      decrementPageNumber();
-    }
-  };
-
   const onSwipe = (event: any) => {
-  
+   
+    
     if (event.translationX < 0) {
       // Swipe right
+
       incrementPageNumber();
-      console.log("Swiped right!");
+      translateX.value = 0;
+      translateY.value = 0;
     } else {
       // Swipe left
-      console.log("Swiped left!");
       decrementPageNumber();
+      translateX.value = 0;
+      translateY.value = 0;
     }
   };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <GestureDetector gesture={Gesture.Pan().onEnd(onSwipe)}>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      <GestureDetector
+        gesture={Gesture.Pan().onChange(onGestureEvent).onEnd(onSwipe).runOnJS(true)}
+      >
+        <Animated.View
+          style={[
+            { flex: 1, justifyContent: "center", alignItems: "center" },
+            animatedStyle,
+          ]}
         >
           <HBAppBar />
           <HBScriptureCard
@@ -94,9 +98,9 @@ const TranslateAndRevise: React.FC = () => {
             title={title}
             notes={notes}
           />
-          <AudioPlayer audioUri={audioURI}/>
+          <AudioPlayer audioUri={audioURI} />
           <HBRecordBar />
-        </View>
+        </Animated.View>
       </GestureDetector>
     </GestureHandlerRootView>
   );

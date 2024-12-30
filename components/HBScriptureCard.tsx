@@ -20,9 +20,7 @@ import { ViewStyle } from "react-native/Libraries/StyleSheet/StyleSheetTypes";
 
 const { width: screenWidth } = Dimensions.get("screen");
 
-type Props = {
-  size: number;
-};
+
 
 interface HBScriptureCard {
   imageURI: string;
@@ -81,7 +79,10 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
     setWordDialogTitle(highlightedWords[ndx]);
 
-    var dialogNotes = wordData.get(highlightedWords[ndx]);
+    
+
+
+    var dialogNotes = wordData.get(stripWordsofSpecialCharacters(highlightedWords[ndx],'",.;'));
 
     setWordDialogNote(dialogNotes);
   };
@@ -97,6 +98,18 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     setWordDialogVisible(false);
   };
 
+  const stripWordsofSpecialCharacters = (word:string, charsToRemove:string):string => {
+
+
+    let newWord = word;
+    for (const char of charsToRemove) {
+      newWord = newWord.replace(char, '');
+    }
+
+    return newWord;
+
+  }
+
   const highlightWords = (tokenizedPassage:string):string => {
 
     var wordLinks: any[] = [];
@@ -104,10 +117,12 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     var modifiedPassage = tokenizedPassage;
 
     tokenizedPassage.split(" ").map((word, index) => {
-      console.log("Word", word);
+     
 
-      if (wordData.get(word)) {
-        console.log("Modify Word", word);
+      var newWord=stripWordsofSpecialCharacters(word,'",.;')
+
+      if (wordData.get(newWord)) {
+     
         modifiedPassage = modifiedPassage.replace(
           word,
           "<<<~wndx~" + ndx + "<<<"
@@ -216,10 +231,10 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           visible={exegeticalDialogVisible}
           onDismiss={closeExegeticalDialog}
         >
-          <Dialog.Title>Phrase:</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>Phrase:</Dialog.Title>
 
           <Dialog.Content>
-            <Text>{exegeticalDialogNote.words}</Text>
+            <Text style={styles.dialogContent}>{exegeticalDialogNote.words}</Text>
           </Dialog.Content>
 
           {exegeticalDialogNote.av &&
@@ -238,35 +253,35 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
             ""
           )}
 
-          <Dialog.Title>Exegetical Notes:</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>Exegetical Notes:</Dialog.Title>
 
           <Dialog.Content>
-            <Text>{exegeticalDialogNote.BEN}</Text>
+            <Text style={styles.dialogContent}>{exegeticalDialogNote.BEN}</Text>
           </Dialog.Content>
 
           {exegeticalDialogNote.comment ? (
-            <Dialog.Title>Commentary:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>Commentary:</Dialog.Title>
           ) : (
             ""
           )}
 
           {exegeticalDialogNote.comment ? (
             <Dialog.Content>
-              <Text>{exegeticalDialogNote.comment}</Text>
+              <Text style={styles.dialogContent}>{exegeticalDialogNote.comment}</Text>
             </Dialog.Content>
           ) : (
             ""
           )}
 
           {exegeticalDialogNote.parallelRef ? (
-            <Dialog.Title>Parallel References:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>Parallel References:</Dialog.Title>
           ) : (
             ""
           )}
 
           {exegeticalDialogNote.parallelRef ? (
             <Dialog.Content>
-              <Text>{exegeticalDialogNote.parallelRef}</Text>
+              <Text style={styles.dialogContent}>{exegeticalDialogNote.parallelRef}</Text>
             </Dialog.Content>
           ) : (
             ""
@@ -298,55 +313,55 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           visible={wordDialogVisible}
           onDismiss={closeWordDialog}
         >
-          <Dialog.Title>Word Study:</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>Word Study:</Dialog.Title>
 
           <Dialog.Content>
-            <Text>{wordDialogTitle}</Text>
+            <Text style={styles.dialogContent}>{wordDialogTitle}</Text>
           </Dialog.Content>
 
-          <Dialog.Title>Meaning:</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>Meaning:</Dialog.Title>
 
           <Dialog.Content>
-            <Text>{wordDialogNote?.meaning}</Text>
+            <Text style={styles.dialogContent}>{wordDialogNote?.meaning}</Text>
           </Dialog.Content>
 
           {wordDialogNote?.altFormSym ? (
-            <Dialog.Title>Alternate Form or Synonyms:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>Alternate Form or Synonyms:</Dialog.Title>
           ) : (
             ""
           )}
 
           {wordDialogNote?.altFormSym ? (
             <Dialog.Content>
-              <Text>{wordDialogNote.altFormSym}</Text>
+              <Text style={styles.dialogContent}>{wordDialogNote.altFormSym}</Text>
             </Dialog.Content>
           ) : (
             ""
           )}
 
           {wordDialogNote?.otherLangEx ? (
-            <Dialog.Title>Other Language Examples:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>Other Language Examples:</Dialog.Title>
           ) : (
             ""
           )}
 
           {wordDialogNote?.otherLangEx ? (
-            <Dialog.Content>
-              <Text>{wordDialogNote.otherLangEx}</Text>
+            <Dialog.Content >
+              <Text style={styles.dialogContent}>{wordDialogNote.otherLangEx}</Text>
             </Dialog.Content>
           ) : (
             ""
           )}
 
           {wordDialogNote?.relatedTerms ? (
-            <Dialog.Title>Related Terms:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>Related Terms:</Dialog.Title>
           ) : (
             ""
           )}
 
           {wordDialogNote?.relatedTerms ? (
             <Dialog.Content>
-              <Text>{wordDialogNote.relatedTerms}</Text>
+              <Text style={styles.dialogContent}>{wordDialogNote.relatedTerms}</Text>
             </Dialog.Content>
           ) : (
             ""
@@ -378,6 +393,14 @@ const styles = StyleSheet.create({
 
   phrases: {
     color: "red",
+  },
+
+  dialogContent: {
+    fontSize: 12,
+  },
+
+  dialogTitle: {
+    fontSize: 16,
   },
 });
 

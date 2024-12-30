@@ -1,68 +1,140 @@
-import "react-native-gesture-handler";
-
-import { View, Text } from "react-native";
-import { Button } from "react-native-paper";
+import React, { useState } from "react";
+import { View, ScrollView, StyleSheet, SafeAreaView } from "react-native";
+import {
+  Card,
+  Title,
+  Appbar,
+  IconButton,
+  MD3Colors,
+  Button,
+} from "react-native-paper";
+import GetTemplate from "@/components/GetTemplate";
 import { useNavigation } from "expo-router";
-import { DrawerActions } from "@react-navigation/native";
-import { Platform } from "react-native";
-import createFolder from "@/components/CreateWorkSpace";
-import GetTemplate from "@/components/DocumentPicker";
-import React from "react";
-import SoundTest from "@/components/SoundTest";
+
+import { useTranslation } from "react-i18next";
+import BooksOfBible from "../data/BooksOfBible";
+import ChaptersOfBible from "../data/ChaptersOfBible";
 import { useAppContext } from "@/context/AppContext";
+import { DrawerActions } from "@react-navigation/native";
 
-const isPhone = Platform.OS === "ios" || Platform.OS === "android";
-const isTablet = Platform.OS === "ios" && Platform.OS !== "ios";
-const isWeb = Platform.OS === "web";
-
-console.log("index");
-
-const Index: React.FC = () => {
+const BibleBookList: React.FC = () => {
   const navigation = useNavigation();
+  function handleBookPress(item: string) {
+    setBibleBook(item);
+    setAreBooksVisible(false);
+    setAreChaptersVisible(true);
+  }
 
-  const { count, increment, decrement, loadTemplate } = useAppContext();
-
-  const onToggle = () => {
-    navigation.dispatch(DrawerActions.openDrawer());
-  };
-  const onNavigate = () => {
+  function handleChapterPress(item: string) {
+    loadTemplate(item);
     navigation.dispatch(DrawerActions.jumpTo("TranslateAndRevise"));
-  };
-
-  console.log("Platform.OS", Platform.OS);
-  if (isWeb) {
-  } else {
+    setAreChaptersVisible(false);
+    setAreBooksVisible(true);
   }
- 
 
-  function buildFolder() {
-    createFolder("honeybee_work2");
-  }
+  const { loadTemplate } = useAppContext();
+
+  const { t } = useTranslation();
+
+  const [areBooksVisible, setAreBooksVisible] = useState<Boolean>(true);
+  const [areChaptersVisible, setAreChaptersVisible] = useState<Boolean>(false);
+  const [bibleBook, setBibleBook] = useState<string>("");
+
+  const renderBooks = (item: string, index: number) => (
+    <Card
+      key={index}
+      style={styles.books}
+      onPress={() => handleBookPress(item)}
+    >
+      <Card.Content>
+        <Title numberOfLines={2} style={styles.bookTitle}>
+          {t(item)}
+        </Title>
+      </Card.Content>
+    </Card>
+  );
+
+  const renderChapters = (item: string, index: number) => (
+    <Card
+      key={index}
+      style={styles.chapters}
+      onPress={() => handleChapterPress(item)}
+    >
+      <Card.Content>
+        <Title numberOfLines={2} style={styles.chapterTitle}>
+          {t(item)}
+        </Title>
+        <View style={styles.iconContainer}>
+          <IconButton
+            icon="download"
+            iconColor={"blue"}
+            size={25}
+            onPress={() => console.log("Pressed")}
+          />
+          <GetTemplate />
+        </View>
+      </Card.Content>
+    </Card>
+  );
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Home</Text>
-      <Button onPress={onToggle}>Press Me</Button>
-      <Button onPress={onNavigate}>Translate+Revise</Button>
-      <Button onPress={buildFolder}>Create Work Folder</Button>
-
-      <GetTemplate />
-
+    <SafeAreaView>
       <View>
-        <Text>Count: {count}</Text>
-        <Button onPress={increment}>Increment</Button>
-        <Button onPress={decrement}>Decrement</Button>
-        <Button onPress={decrement}>Decrement</Button>
-        <Button
-          onPress={() => {
-            loadTemplate("Jonah 1-2 2");
-          }}
-        >
-          Load Template
-        </Button>
+        <Appbar.Header>
+          <Appbar.Content title={t("Templates")} />
+        </Appbar.Header>
+
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {areBooksVisible && (
+            <View style={{ flex: 1, flexDirection: "row", flexWrap: "wrap" }}>
+              {BooksOfBible.map((item, index) => renderBooks(item, index))}
+            </View>
+          )}
+          {areChaptersVisible && (
+            <View style={{ flex: 1, flexDirection: "row", flexWrap: "wrap" }}>
+              <Button
+                onPress={() => {
+                  setAreChaptersVisible(false);
+                  setAreBooksVisible(true);
+                }}
+              >
+                Go Back
+              </Button>
+              {ChaptersOfBible.filter((item) => item.includes(bibleBook)).map(
+                (item, index) => renderChapters(item, index)
+              )}
+            </View>
+          )}
+        </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
-export default Index;
+export default BibleBookList;
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    flexDirection: "row",
+  },
+  books: {
+    width: 120, // Adjust the width as needed
+    height: 80, // Adjust the height as needed
+    margin: 2,
+    borderRadius: 10,
+  },
+  chapters: {
+    width: 180, // Adjust the width as needed
+    height: 120, // Adjust the height as needed
+    margin: 2,
+    borderRadius: 10,
+  },
+  bookTitle: {
+    fontSize: 13,
+    fontWeight: "bold",
+  },
+  chapterTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+});

@@ -1,6 +1,7 @@
 import * as DocumentPicker from "expo-document-picker";
 import React, { useState, useEffect, FC } from "react";
-import { Button, Text, View } from "react-native";
+import { View } from "react-native";
+import { IconButton, Text } from "react-native-paper";
 import copyAndWriteFile from "@/helpers/CopyAndWriteFile";
 import unzipFile from "@/helpers/UnzipFile";
 import fileExists from "@/helpers/FileExists";
@@ -20,34 +21,20 @@ const GetTemplate: React.FC = () => {
     null
   );
 
-  const  FileCopyComplete  = async () => { 
-
-    console.log("complete")
-    
+  const FileCopyComplete = async () => {
     const fileUri = FileSystem.documentDirectory + selectedFile!.name;
-    const dest = fileUri.split(".zip")
-    const dest2 = `${FileSystem.documentDirectory}`
+    const dest = fileUri.split(".zip");
+    const dest2 = `${FileSystem.documentDirectory}`;
 
     if (await fileExists(fileUri)) {
-
-        console.log("fileExists in FileCopyComplete")
-
-        unzipFile(fileUri, dest2);
-        listFiles(dest2+ "/Jonah 1-2 2/audioVisual/");
-      
-    
-
-
+      unzipFile(fileUri, dest2);
     }
-   
 
-    return 
-
-
-  }
+    return;
+  };
 
   useEffect(() => {
-    console.log("uri", selectedFile);
+   
     if (selectedFile === null) {
       return;
     }
@@ -79,14 +66,14 @@ const GetTemplate: React.FC = () => {
 
   return (
     <View>
-      <Button title="Select File" onPress={handleFileSelect} />
-      {selectedFile && (
-        <View>
-          <Text>File Name: {selectedFile.name}</Text>
-          <Text>File Type: {selectedFile.type}</Text>
-          <Text>File Size: {selectedFile.size} bytes</Text>
-        </View>
-      )}
+      <IconButton
+        icon="import"
+        iconColor={"blue"}
+        size={25}
+        onPress={handleFileSelect}
+      />
+
+   
     </View>
   );
 };

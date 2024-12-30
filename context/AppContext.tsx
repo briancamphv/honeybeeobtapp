@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
-import {useAssets} from 'expo-asset';
-
-
+import { useAssets } from "expo-asset";
 
 // Define the type for the context values
 
@@ -22,7 +20,10 @@ interface AppContextType {
   decrementPageNumber: () => void;
   enableAudio: () => void;
   disableAudio: () => void;
+  isPlayRecording: () => void;
+  isNotPlayRecording: () => void;
   template: string;
+  playRecording: boolean;
   audioStop: boolean;
   audioURI: string;
   imageURI: string;
@@ -30,7 +31,7 @@ interface AppContextType {
   notes: any;
   title: string;
   templatePassages: any[];
-  wordData: Map<string, WordNote>,
+  wordData: Map<string, WordNote>;
 }
 
 // Create the context
@@ -62,56 +63,51 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   const [pageNumber, setPageNumber] = useState<number>(0);
 
   const [audioStop, setAudioStop] = useState<boolean>(false);
+  const [playRecording, setPlayRecording] = useState<boolean>(false);
 
   const [templateJSON, setTemplateJSON] = useState<any>({});
   const [templatePassages, setTemplatePassages] = useState<any>([]);
 
   const [wordData, setWordData] = useState<Map<string, WordNote>>(new Map());
-   
-  const [assets, error] = useAssets(require('../assets/data/wordlinks.csv'))
- 
+
+  const [assets, error] = useAssets(require("../assets/data/wordlinks.csv"));
 
   useEffect(() => {
- 
+    if (assets === undefined) {
+      return;
+    }
 
-    if (assets === undefined) {return}
-    
     const fetchData = async () => {
-     
       try {
-       
-        const fileContent = await FileSystem.readAsStringAsync(assets![0].localUri!);
-        const lines = fileContent.split('\r\n');
+        const fileContent = await FileSystem.readAsStringAsync(
+          assets![0].localUri!
+        );
+        const lines = fileContent.split("\r\n");
 
         // skip header line
         const dataLines = lines.slice(1);
         const wordMap = new Map();
 
-        dataLines.map( line => {
-          var fields = line.split('\t')
+        dataLines.map((line) => {
+          var fields = line.split("\t");
           var JSON = {
-            "altFormSym": fields[2],
-            "otherLangEx": fields[3],
-            "meaning": fields[4],
-            "relatedTerms": fields[5],
-          }
+            altFormSym: fields[2],
+            otherLangEx: fields[3],
+            meaning: fields[4],
+            relatedTerms: fields[5],
+          };
 
-          wordMap.set(fields[1],JSON)
+          wordMap.set(fields[1], JSON);
+        });
 
-        })
-         
-        setWordData(wordMap)
-
-
-
+        setWordData(wordMap);
       } catch (error) {
-        console.error('Error reading CSV file:', error);
+        console.error("Error reading CSV file:", error);
       }
     };
 
-   
     fetchData();
-  },[assets])
+  }, [assets]);
 
   useEffect(() => {
     if (Object.keys(templateJSON).length === 0) {
@@ -143,11 +139,11 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   }, [pageNumber]); // Empty dependency array
 
   useEffect(() => {
- 
-    loadTemplate("Jonah 1-2 2");
+    loadTemplate("Jonah 1-2");
   }, []);
 
   function incrementPageNumber() {
+
     disableAudio();
     if (pageNumber === templatePassages.length - 1) {
       setPageNumber(0);
@@ -157,6 +153,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   }
 
   function decrementPageNumber() {
+  
     disableAudio();
     if (pageNumber === 0) {
       setPageNumber(templatePassages.length - 1);
@@ -227,7 +224,13 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     setAudioStop(false);
   };
 
+  const isPlayRecording = () => {
+    setPlayRecording(true);
+  };
 
+  const isNotPlayRecording = () => {
+    setPlayRecording(false);
+  };
 
   return (
     <AppContext.Provider
@@ -242,6 +245,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         audioStop,
         template,
         wordData,
+        playRecording,
         increment,
         decrement,
         loadTemplate,
@@ -249,6 +253,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         disableAudio,
         incrementPageNumber,
         decrementPageNumber,
+        isPlayRecording,
+        isNotPlayRecording,
       }}
     >
       {children}
