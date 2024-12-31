@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
 import { useAssets } from "expo-asset";
+import { useTranslation } from "react-i18next";
 
 // Define the type for the context values
 
@@ -22,6 +23,10 @@ interface AppContextType {
   disableAudio: () => void;
   isPlayRecording: () => void;
   isNotPlayRecording: () => void;
+  setStep: (step: string) => void;
+  languageSwitcher: (lng:string) => void;
+  language: string;
+  translationStep: string;
   template: string;
   playRecording: boolean;
   audioStop: boolean;
@@ -54,12 +59,15 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
 }) => {
   const [count, setCount] = useState(0);
 
+  const [translationStep, setTranslationStep] = useState<string>("");
+
   const [audioURI, setAudioURI] = useState<string>("");
   const [imageURI, setImageURI] = useState<string>("");
   const [passageText, setPassageText] = useState<string>("");
   const [notes, setNotes] = useState<any[]>([]);
   const [title, setTitle] = useState<string>("");
   const [template, setTemplate] = useState<string>("");
+  const [language, setLanguage] = useState<string>("en");
   const [pageNumber, setPageNumber] = useState<number>(0);
 
   const [audioStop, setAudioStop] = useState<boolean>(false);
@@ -139,11 +147,19 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   }, [pageNumber]); // Empty dependency array
 
   useEffect(() => {
-    loadTemplate("Jonah 1-2");
+    // loadTemplate("Jonah 1-2");
+    //languageSwitcher("fr");
   }, []);
 
-  function incrementPageNumber() {
+  function setStep(step: string) {
+    setTranslationStep(step);
+  }
 
+  function languageSwitcher(lng: string) {
+    setLanguage(lng);
+  }
+
+  function incrementPageNumber() {
     disableAudio();
     if (pageNumber === templatePassages.length - 1) {
       setPageNumber(0);
@@ -153,7 +169,6 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   }
 
   function decrementPageNumber() {
-  
     disableAudio();
     if (pageNumber === 0) {
       setPageNumber(templatePassages.length - 1);
@@ -169,7 +184,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
 
     try {
       const fileUri =
-        FileSystem.documentDirectory + "/" + template + "/text.json";
+        FileSystem.documentDirectory + "/" + template + "/" + language + "_text.json";
       const jsonData = await FileSystem.readAsStringAsync(fileUri);
       const retJSON = JSON.parse(jsonData);
 
@@ -199,7 +214,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
           retJSON.passages[pageNumber].verses
       );
 
-      setTemplatePassages(templateJSON.passages);
+      setTemplatePassages(retJSON.passages);
 
       return retJSON;
     } catch (error) {
@@ -246,8 +261,12 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         template,
         wordData,
         playRecording,
+        translationStep,
+        language,
+        languageSwitcher,
         increment,
         decrement,
+        setStep,
         loadTemplate,
         enableAudio,
         disableAudio,

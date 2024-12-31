@@ -26,15 +26,18 @@ const BibleBookList: React.FC = () => {
   }
 
   function handleChapterPress(item: string) {
-    loadTemplate(item);
-    navigation.dispatch(DrawerActions.jumpTo("TranslateAndRevise"));
-    setAreChaptersVisible(false);
-    setAreBooksVisible(true);
+    loadTemplate(item).then(() => {
+      navigation.dispatch(DrawerActions.jumpTo("TranslateAndRevise"));
+      setAreChaptersVisible(false);
+      setAreBooksVisible(true);
+    });
   }
 
-  const { loadTemplate } = useAppContext();
+  const { loadTemplate, languageSwitcher, language } = useAppContext();
 
   const { t } = useTranslation();
+
+  languageSwitcher("fr");
 
   const [areBooksVisible, setAreBooksVisible] = useState<Boolean>(true);
   const [areChaptersVisible, setAreChaptersVisible] = useState<Boolean>(false);
@@ -48,7 +51,7 @@ const BibleBookList: React.FC = () => {
     >
       <Card.Content>
         <Title numberOfLines={2} style={styles.bookTitle}>
-          {t(item)}
+          {t(item, { lng: language })}
         </Title>
       </Card.Content>
     </Card>
@@ -62,7 +65,7 @@ const BibleBookList: React.FC = () => {
     >
       <Card.Content>
         <Title numberOfLines={2} style={styles.chapterTitle}>
-          {t(item)}
+          {t(item, { lng: language })}
         </Title>
         <View style={styles.iconContainer}>
           <IconButton
@@ -81,7 +84,7 @@ const BibleBookList: React.FC = () => {
     <SafeAreaView>
       <View>
         <Appbar.Header>
-          <Appbar.Content title={t("Templates")} />
+          <Appbar.Content title={t("Templates", { lng: language })} />
         </Appbar.Header>
 
         <ScrollView showsVerticalScrollIndicator={false}>

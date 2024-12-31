@@ -2,10 +2,13 @@ import * as DocumentPicker from "expo-document-picker";
 import React, { useState, useEffect, FC } from "react";
 import { View } from "react-native";
 import { IconButton, Text } from "react-native-paper";
-import copyAndWriteFile from "@/helpers/CopyAndWriteFile";
-import unzipFile from "@/helpers/UnzipFile";
-import fileExists from "@/helpers/FileExists";
-import listFiles from "@/helpers/ListFiles";
+
+import {
+  copyAndWriteFile,
+  unzipFile,
+  fileExists,
+  deleteFile,
+} from "@/helpers/FileUtilies";
 
 import * as FileSystem from "expo-file-system";
 
@@ -23,18 +26,16 @@ const GetTemplate: React.FC = () => {
 
   const FileCopyComplete = async () => {
     const fileUri = FileSystem.documentDirectory + selectedFile!.name;
-    const dest = fileUri.split(".zip");
-    const dest2 = `${FileSystem.documentDirectory}`;
+    const dest = `${FileSystem.documentDirectory}`;
 
     if (await fileExists(fileUri)) {
-      unzipFile(fileUri, dest2);
+      unzipFile(fileUri, dest).then(() => deleteFile(fileUri));
     }
 
     return;
   };
 
   useEffect(() => {
-   
     if (selectedFile === null) {
       return;
     }
@@ -72,8 +73,6 @@ const GetTemplate: React.FC = () => {
         size={25}
         onPress={handleFileSelect}
       />
-
-   
     </View>
   );
 };

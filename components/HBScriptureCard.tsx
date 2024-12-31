@@ -20,8 +20,6 @@ import { ViewStyle } from "react-native/Libraries/StyleSheet/StyleSheetTypes";
 
 const { width: screenWidth } = Dimensions.get("screen");
 
-
-
 interface HBScriptureCard {
   imageURI: string;
   passageText: string;
@@ -65,6 +63,9 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       av: "",
     });
 
+  const { language } = useAppContext();
+  
+
   const [wordDialogNote, setWordDialogNote] = useState<WordNote>();
   const [wordDialogTitle, setWordDialogTitle] = useState<String>("");
 
@@ -79,10 +80,9 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
     setWordDialogTitle(highlightedWords[ndx]);
 
-    
-
-
-    var dialogNotes = wordData.get(stripWordsofSpecialCharacters(highlightedWords[ndx],'",.;'));
+    var dialogNotes = wordData.get(
+      stripWordsofSpecialCharacters(highlightedWords[ndx], '",.;')
+    );
 
     setWordDialogNote(dialogNotes);
   };
@@ -98,31 +98,27 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     setWordDialogVisible(false);
   };
 
-  const stripWordsofSpecialCharacters = (word:string, charsToRemove:string):string => {
-
-
+  const stripWordsofSpecialCharacters = (
+    word: string,
+    charsToRemove: string
+  ): string => {
     let newWord = word;
     for (const char of charsToRemove) {
-      newWord = newWord.replace(char, '');
+      newWord = newWord.replace(char, "");
     }
 
     return newWord;
+  };
 
-  }
-
-  const highlightWords = (tokenizedPassage:string):string => {
-
+  const highlightWords = (tokenizedPassage: string): string => {
     var wordLinks: any[] = [];
     var ndx = 0;
     var modifiedPassage = tokenizedPassage;
 
     tokenizedPassage.split(" ").map((word, index) => {
-     
-
-      var newWord=stripWordsofSpecialCharacters(word,'",.;')
+      var newWord = stripWordsofSpecialCharacters(word, '",.;');
 
       if (wordData.get(newWord)) {
-     
         modifiedPassage = modifiedPassage.replace(
           word,
           "<<<~wndx~" + ndx + "<<<"
@@ -133,12 +129,12 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       }
     });
     setHighlightedWords(wordLinks);
-    return modifiedPassage
-  }
- 
+    return modifiedPassage;
+  };
+
   useEffect(() => {
     if (notes === null || notes === undefined) {
-      var modifiedPassage=highlightWords(passageText);
+      var modifiedPassage = highlightWords(passageText);
       setHighlightedPassage(modifiedPassage);
       return;
     }
@@ -167,10 +163,10 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
     // tokenize for words
 
-    var modifiedPassage=highlightWords(tokenizedPassage)
- 
+    var modifiedPassage = highlightWords(tokenizedPassage);
+
     setHighlightedPhrases(phrases);
-    
+
     setHighlightedPassage(modifiedPassage);
   }, [notes]); // Empty dependency array
 
@@ -231,10 +227,12 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           visible={exegeticalDialogVisible}
           onDismiss={closeExegeticalDialog}
         >
-          <Dialog.Title style={styles.dialogTitle}>Phrase:</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>{t("Phrase", { lng: language })}:</Dialog.Title>
 
           <Dialog.Content>
-            <Text style={styles.dialogContent}>{exegeticalDialogNote.words}</Text>
+            <Text style={styles.dialogContent}>
+              {exegeticalDialogNote.words}
+            </Text>
           </Dialog.Content>
 
           {exegeticalDialogNote.av &&
@@ -253,35 +251,43 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
             ""
           )}
 
-          <Dialog.Title style={styles.dialogTitle}>Exegetical Notes:</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>
+            {t("Exegetical Notes", { lng: language })}:
+          </Dialog.Title>
 
           <Dialog.Content>
             <Text style={styles.dialogContent}>{exegeticalDialogNote.BEN}</Text>
           </Dialog.Content>
 
           {exegeticalDialogNote.comment ? (
-            <Dialog.Title style={styles.dialogTitle}>Commentary:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>{t("Commentary", { lng: language })}:</Dialog.Title>
           ) : (
             ""
           )}
 
           {exegeticalDialogNote.comment ? (
             <Dialog.Content>
-              <Text style={styles.dialogContent}>{exegeticalDialogNote.comment}</Text>
+              <Text style={styles.dialogContent}>
+                {exegeticalDialogNote.comment}
+              </Text>
             </Dialog.Content>
           ) : (
             ""
           )}
 
           {exegeticalDialogNote.parallelRef ? (
-            <Dialog.Title style={styles.dialogTitle}>Parallel References:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>
+              {t("Parallel References", { lng: language })}:
+            </Dialog.Title>
           ) : (
             ""
           )}
 
           {exegeticalDialogNote.parallelRef ? (
             <Dialog.Content>
-              <Text style={styles.dialogContent}>{exegeticalDialogNote.parallelRef}</Text>
+              <Text style={styles.dialogContent}>
+                {exegeticalDialogNote.parallelRef}
+              </Text>
             </Dialog.Content>
           ) : (
             ""
@@ -313,55 +319,67 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           visible={wordDialogVisible}
           onDismiss={closeWordDialog}
         >
-          <Dialog.Title style={styles.dialogTitle}>Word Study:</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>{t("Word Study", { lng: language })}:</Dialog.Title>
 
           <Dialog.Content>
             <Text style={styles.dialogContent}>{wordDialogTitle}</Text>
           </Dialog.Content>
 
-          <Dialog.Title style={styles.dialogTitle}>Meaning:</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>{t("Meaning", { lng: language })}:</Dialog.Title>
 
           <Dialog.Content>
             <Text style={styles.dialogContent}>{wordDialogNote?.meaning}</Text>
           </Dialog.Content>
 
           {wordDialogNote?.altFormSym ? (
-            <Dialog.Title style={styles.dialogTitle}>Alternate Form or Synonyms:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>
+              {t("Alternate Forms or Synonyms", { lng: language })}:
+            </Dialog.Title>
           ) : (
             ""
           )}
 
           {wordDialogNote?.altFormSym ? (
             <Dialog.Content>
-              <Text style={styles.dialogContent}>{wordDialogNote.altFormSym}</Text>
+              <Text style={styles.dialogContent}>
+                {wordDialogNote.altFormSym}
+              </Text>
             </Dialog.Content>
           ) : (
             ""
           )}
 
           {wordDialogNote?.otherLangEx ? (
-            <Dialog.Title style={styles.dialogTitle}>Other Language Examples:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>
+              {t("Other Language Examples", { lng: language })}:
+            </Dialog.Title>
           ) : (
             ""
           )}
 
           {wordDialogNote?.otherLangEx ? (
-            <Dialog.Content >
-              <Text style={styles.dialogContent}>{wordDialogNote.otherLangEx}</Text>
+            <Dialog.Content>
+              <Text style={styles.dialogContent}>
+                {wordDialogNote.otherLangEx}
+              </Text>
             </Dialog.Content>
           ) : (
             ""
           )}
 
           {wordDialogNote?.relatedTerms ? (
-            <Dialog.Title style={styles.dialogTitle}>Related Terms:</Dialog.Title>
+            <Dialog.Title style={styles.dialogTitle}>
+              {t("Related Terms", { lng: language })}:
+            </Dialog.Title>
           ) : (
             ""
           )}
 
           {wordDialogNote?.relatedTerms ? (
             <Dialog.Content>
-              <Text style={styles.dialogContent}>{wordDialogNote.relatedTerms}</Text>
+              <Text style={styles.dialogContent}>
+                {wordDialogNote.relatedTerms}
+              </Text>
             </Dialog.Content>
           ) : (
             ""

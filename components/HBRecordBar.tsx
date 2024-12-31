@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Dimensions, TouchableOpacity } from "react-native";
+import * as FileSystem from "expo-file-system";
 
 import {
   Appbar,
@@ -16,7 +17,9 @@ import { useTranslation } from "react-i18next";
 
 import { useAppContext } from "@/context/AppContext";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+
+import { copyAndWriteFile, listFiles, deleteFile } from "@/helpers/FileUtilies";
 
 import audioRecorderPlayer, {
   PlayBackType,
@@ -27,10 +30,22 @@ import audioRecorderPlayer, {
 //   message: string;
 // }
 
+const { width: screenWidth } = Dimensions.get("screen");
+
 const audioRecorder = new audioRecorderPlayer();
 
 const HBRecordBar: React.FC = () => {
-  const { disableAudio, isPlayRecording, isNotPlayRecording } = useAppContext();
+  const {
+    disableAudio,
+    isPlayRecording,
+    isNotPlayRecording,
+    template,
+    translationStep,
+    title,
+    language,
+  } = useAppContext();
+
+  
 
   const { t } = useTranslation();
 
@@ -45,7 +60,18 @@ const HBRecordBar: React.FC = () => {
   // const [position, setPosition] = useState<number | undefined>(undefined);
   const [playing, setPlaying] = useState<boolean>(false);
 
+  const recordDir =
+    FileSystem.documentDirectory! +
+    template +
+    "/" +
+    title +
+    "/" +
+    translationStep +
+    "/";
+
   const [hasStarted, setHasStarted] = useState<boolean>(false);
+  const [draftRecordings, setDraftRecordings] = useState<string[]>([]);
+
 
   const [audioURI, setAudioUri] = useState<string>("");
 
@@ -73,10 +99,34 @@ const HBRecordBar: React.FC = () => {
     const result = await audioRecorder.startRecorder();
   };
 
+  const playDraftRecording = async (item: string) => {
+    var playFile = recordDir + item;
+
+    audioRecorder.startPlayer(playFile);
+  };
+
+  const deleteDraftRecording = async (item: string) => {
+    var playFile = recordDir + item;
+
+    var newList = draftRecordings.filter((item) => item !== playFile)
+
+    setDraftRecordings((prevItems) => prevItems.filter((item) => item !== item))
+
+    deleteFile(playFile);
+  };
+
   const onStopRecord = async () => {
     setIsRecording(false);
 
     const result = await audioRecorder.stopRecorder();
+
+    var files = await listFiles(recordDir);
+
+    var destFile = recordDir + "draftv" + (files.length + 1) + ".mp4";
+
+    await copyAndWriteFile(result, destFile, () => null);
+
+    console.log("record file", result, destFile);
 
     setAudioUri(result);
     setHasStarted(false);
@@ -84,6 +134,8 @@ const HBRecordBar: React.FC = () => {
 
   const onStartPlay = async () => {
     isPlayRecording();
+
+    console.log("audioURI", audioURI);
 
     const msg = await audioRecorder.startPlayer(audioURI);
     setPlaying(true);
@@ -103,6 +155,19 @@ const HBRecordBar: React.FC = () => {
       setHasStarted(true);
       onStartPlay();
     }
+  };
+
+  const [draftRecordsDialogVisible, setDraftRecordsDialogVisible] =
+    useState<boolean>(false);
+
+  const openDraftRecordsDialog = () => {
+    listFiles(recordDir).then((list) => setDraftRecordings(list));
+
+    setDraftRecordsDialogVisible(true);
+  };
+
+  const closeDraftRecordsDialog = () => {
+    setDraftRecordsDialogVisible(false);
   };
 
   const onStopPlay = async () => {
@@ -198,14 +263,15 @@ const HBRecordBar: React.FC = () => {
   // };
 
   const openRecordingFolder = () => {
-    console.log("open folder");
+    openDraftRecordsDialog();
   };
 
   return (
     <>
       <Appbar.Header elevated={true} style={styles.title}>
+        <Appbar.Content title="Recording" color="white" />
         <Appbar.Action
-          icon={isRecording ? "stop" : "record"}
+          icon={isRecording ? "stop" : "microphone"}
           size={30}
           color="white"
           onPress={isRecording ? onStopRecord : onStartRecord}
@@ -232,6 +298,51 @@ const HBRecordBar: React.FC = () => {
           onPress={openRecordingFolder}
         />
       </Appbar.Header>
+
+      <Portal>
+        <Dialog
+          style={{ width: screenWidth - 50 }}
+          visible={draftRecordsDialogVisible}
+          onDismiss={closeDraftRecordsDialog}
+        >
+          <Dialog.Title style={styles.dialogTitle}>{t("Recordings", {lng: language})}:</Dialog.Title>
+
+          <Dialog.Content>
+            {draftRecordings.map((item, index) => {
+              return (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    width: screenWidth - 100,
+                    alignItems: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => playDraftRecording(item)}
+                  >
+                    <Icon color="black" source="play" size={25} />
+                  </TouchableOpacity>
+
+                  <Text style={styles.dialogContent}>{item}</Text>
+
+                  <TouchableOpacity
+                    key={index + 100}
+                    onPress={() => deleteDraftRecording(item)}
+                  >
+                    <Icon color="red" source="delete" size={25} />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </Dialog.Content>
+
+          <Dialog.Actions>
+            <Button onPress={closeDraftRecordsDialog}>Close</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </>
   );
 };
@@ -242,12 +353,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     height: 50,
     marginBottom: 5,
+    color: "white",
   },
 
   titleContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
+  },
+
+  dialogContent: {
+    fontSize: 12,
+  },
+
+  dialogTitle: {
+    fontSize: 16,
   },
 });
 

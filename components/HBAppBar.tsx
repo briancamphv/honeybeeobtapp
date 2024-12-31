@@ -3,9 +3,7 @@ import * as React from "react";
 import { StyleSheet, View, Alert, TouchableOpacity } from "react-native";
 
 import {
-  Appbar,
   List,
-  IconButton,
   Dialog,
   Portal,
   Button,
@@ -16,33 +14,21 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
+import { useAppContext } from "@/context/AppContext";
 
 const HBAppBar: React.FC = () => {
-  type RootStackParamList = {
-    Login: undefined; // No parameters for Home screen
-    BibleBookList: undefined; // Profile screen expects a userId parameter
-  };
-
-  const isWeb = false;
-
   const navigation = useNavigation();
-
-  const [drawerVisible, setDrawerVisible] = React.useState(false);
 
   const [helpDialogVisible, setHelpDialogVisible] = React.useState(false);
 
-  const [stageMenuOpen, setStageMenuOpen] = React.useState<boolean>(true);
-  const [toggleStackOnLongPress, setToggleStackOnLongPress] =
-    React.useState<boolean>(false);
-
-  const openDrawer = () => navigation.dispatch(DrawerActions.toggleDrawer());
-
-  const onNavigate = (dest:string) => {
+  const onNavigate = (dest: string) => {
     navigation.dispatch(DrawerActions.jumpTo(dest));
   };
 
   const openHelpDialog = () => setHelpDialogVisible(true);
   const closeHelpDialog = () => setHelpDialogVisible(false);
+
+  const { language } = useAppContext();
   const { t } = useTranslation();
 
   const WorkFlowMenu = () => {
@@ -60,7 +46,7 @@ const HBAppBar: React.FC = () => {
             left={(props) => (
               <List.Icon {...props} color="white" icon="microphone" />
             )}
-            title={t("Translate + Revise")}
+            title={t("Translate + Revise", { lng: language })}
             titleStyle={{
               color: "white",
               fontSize: 20,
@@ -85,7 +71,7 @@ const HBAppBar: React.FC = () => {
               left={(props) => (
                 <List.Icon {...props} color="white" icon="account-multiple" />
               )}
-              title="Community Work"
+              title={t("Community Work", { lng: language })}
               onPress={() => onNavigate("index")}
             />
             <List.Item
@@ -98,7 +84,7 @@ const HBAppBar: React.FC = () => {
               left={(props) => (
                 <List.Icon {...props} color="white" icon="bullseye-arrow" />
               )}
-              title="Accuracy Check"
+              title={t("Accuracy Check", { lng: language })}
               onPress={() => onNavigate("BibleBookList")}
             />
           </List.Accordion>
@@ -111,14 +97,14 @@ const HBAppBar: React.FC = () => {
     <>
       <View style={styles.title}>
         <WorkFlowMenu />
-        <TouchableOpacity  onPress={openHelpDialog}>
+        <TouchableOpacity onPress={openHelpDialog}>
           <Icon color="white" source="help" size={25} />
         </TouchableOpacity>
       </View>
 
       <Portal>
         <Dialog visible={helpDialogVisible} onDismiss={closeHelpDialog}>
-          <Dialog.Title>Help</Dialog.Title>
+          <Dialog.Title>{t("Help", { lng: language })}</Dialog.Title>
           <Dialog.Content>
             <Text>Help</Text>
           </Dialog.Content>
@@ -126,55 +112,6 @@ const HBAppBar: React.FC = () => {
             <Button onPress={closeHelpDialog}>Close</Button>
           </Dialog.Actions>
         </Dialog>
-      </Portal>
-      <Portal>
-        <FAB.Group
-          open={stageMenuOpen}
-          icon={stageMenuOpen ? "calendar-today" : "plus"}
-          toggleStackOnLongPress={toggleStackOnLongPress}
-          actions={[
-            { icon: "plus", onPress: () => {} },
-            { icon: "star", label: "Star", onPress: () => {} },
-            { icon: "email", label: "Email", onPress: () => {} },
-            {
-              icon: "bell",
-              label: "Remind",
-              onPress: () => {},
-              size: "medium",
-            },
-            {
-              icon: toggleStackOnLongPress ? "gesture-tap" : "gesture-tap-hold",
-              label: toggleStackOnLongPress
-                ? "Toggle on Press"
-                : "Toggle on Long Press",
-              onPress: () => {
-                setToggleStackOnLongPress(!toggleStackOnLongPress);
-              },
-            },
-          ]}
-          enableLongPressWhenStackOpened
-          onStateChange={({ open }: { open: boolean }) =>
-            setStageMenuOpen(open)
-          }
-          onPress={() => {
-            if (toggleStackOnLongPress) {
-              isWeb ? alert("Fab is Pressed") : Alert.alert("Fab is Pressed");
-              // do something on press when the speed dial is closed
-            } else if (stageMenuOpen) {
-              isWeb ? alert("Fab is Pressed") : Alert.alert("Fab is Pressed");
-              // do something if the speed dial is open
-            }
-          }}
-          onLongPress={() => {
-            if (!toggleStackOnLongPress || stageMenuOpen) {
-              isWeb
-                ? alert("Fab is Long Pressed")
-                : Alert.alert("Fab is Long Pressed");
-              // do something if the speed dial is open
-            }
-          }}
-          visible={true}
-        />
       </Portal>
     </>
   );
@@ -186,7 +123,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     flexDirection: "row",
     alignItems: "baseline",
-    
   },
 
   workflow: {

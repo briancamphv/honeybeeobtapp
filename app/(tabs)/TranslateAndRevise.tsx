@@ -34,10 +34,12 @@ const TranslateAndRevise: React.FC = () => {
     passageText,
     title,
     notes,
+    setStep,
   } = useAppContext();
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+  setStep("translate");
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
