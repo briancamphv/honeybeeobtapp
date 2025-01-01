@@ -39,7 +39,7 @@ const TranslateAndRevise: React.FC = () => {
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
-  setStep("translate");
+ 
 
   const animatedStyle = useAnimatedStyle(() => {
     return {

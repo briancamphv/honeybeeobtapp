@@ -26,6 +26,7 @@ const BibleBookList: React.FC = () => {
   }
 
   function handleChapterPress(item: string) {
+    setStep("translate");
     loadTemplate(item).then(() => {
       navigation.dispatch(DrawerActions.jumpTo("TranslateAndRevise"));
       setAreChaptersVisible(false);
@@ -33,11 +34,11 @@ const BibleBookList: React.FC = () => {
     });
   }
 
-  const { loadTemplate, languageSwitcher, language } = useAppContext();
+  const { loadTemplate, languageSwitcher, language, setStep } = useAppContext();
 
   const { t } = useTranslation();
 
-  languageSwitcher("fr");
+
 
   const [areBooksVisible, setAreBooksVisible] = useState<Boolean>(true);
   const [areChaptersVisible, setAreChaptersVisible] = useState<Boolean>(false);

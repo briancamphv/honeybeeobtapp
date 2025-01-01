@@ -109,7 +109,7 @@ const HBAppBar: React.FC = () => {
             <Text>Help</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={closeHelpDialog}>Close</Button>
+            <Button onPress={closeHelpDialog}>{t("Close", { lng: language })}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

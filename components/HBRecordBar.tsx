@@ -122,7 +122,7 @@ const HBRecordBar: React.FC = () => {
 
     var files = await listFiles(recordDir);
 
-    var destFile = recordDir + "draftv" + (files.length + 1) + ".mp4";
+    var destFile = recordDir + translationStep +  "_draftv" + (files.length + 1) + ".mp4";
 
     await copyAndWriteFile(result, destFile, () => null);
 
@@ -339,7 +339,7 @@ const HBRecordBar: React.FC = () => {
           </Dialog.Content>
 
           <Dialog.Actions>
-            <Button onPress={closeDraftRecordsDialog}>Close</Button>
+            <Button onPress={closeDraftRecordsDialog}>{t("Close", { lng: language })}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

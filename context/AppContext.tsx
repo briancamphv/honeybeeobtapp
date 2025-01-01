@@ -147,9 +147,14 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   }, [pageNumber]); // Empty dependency array
 
   useEffect(() => {
-    // loadTemplate("Jonah 1-2");
-    //languageSwitcher("fr");
+    languageSwitcher("en");
   }, []);
+
+  useEffect(() => {
+    //reload current template
+    if (!template) {return}
+    loadTemplate(template);
+  }, [language]);
 
   function setStep(step: string) {
     setTranslationStep(step);
@@ -188,6 +193,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
       const jsonData = await FileSystem.readAsStringAsync(fileUri);
       const retJSON = JSON.parse(jsonData);
 
+      
       setTemplateJSON(retJSON);
 
       setAudioURI(

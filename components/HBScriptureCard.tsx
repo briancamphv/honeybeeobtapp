@@ -308,7 +308,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           )}
 
           <Dialog.Actions>
-            <Button onPress={closeExegeticalDialog}>Close</Button>
+            <Button onPress={closeExegeticalDialog}>{t("Close", { lng: language })}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -386,7 +386,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           )}
 
           <Dialog.Actions>
-            <Button onPress={closeWordDialog}>Close</Button>
+            <Button onPress={closeWordDialog}>{t("Close", { lng: language })}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
