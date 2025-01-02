@@ -2,6 +2,7 @@ import * as DocumentPicker from "expo-document-picker";
 import React, { useState, useEffect, FC } from "react";
 import { View } from "react-native";
 import { IconButton, Text } from "react-native-paper";
+import { listFiles } from "@/helpers/FileUtilies";
 
 import {
   copyAndWriteFile,
@@ -19,10 +20,26 @@ interface FileSelectionResult {
   size: number;
 }
 
-const GetTemplate: React.FC = () => {
+interface GetTemplate {
+  book: string;
+  template: string;
+}
+
+const GetTemplate: React.FC<GetTemplate> = ({ book, template }) => {
   const [selectedFile, setSelectedFile] = useState<FileSelectionResult | null>(
     null
   );
+
+  const [templatedDownloaded, setTemplatedDownloaded] =
+    useState<boolean>(false);
+
+  const recordDir = FileSystem.documentDirectory! + template;
+
+  listFiles(recordDir).then((files) => {
+    if (files.length > 0) {
+      setTemplatedDownloaded(true);
+    }
+  });
 
   const FileCopyComplete = async () => {
     const fileUri = FileSystem.documentDirectory + selectedFile!.name;
@@ -65,16 +82,18 @@ const GetTemplate: React.FC = () => {
     }
   };
 
-  return (
-    <View>
-      <IconButton
-        icon="import"
-        iconColor={"blue"}
-        size={25}
-        onPress={handleFileSelect}
-      />
-    </View>
-  );
+  if (!templatedDownloaded) {
+    return (
+      <View>
+        <IconButton
+          icon="import"
+          iconColor={"blue"}
+          size={25}
+          onPress={handleFileSelect}
+        />
+      </View>
+    );
+  }
 };
 
 export default GetTemplate;

@@ -4,7 +4,7 @@ import * as FileSystem from "expo-file-system";
 
 import checkFileType from "@/helpers/FileTypeCheck";
 
-import { StyleProp, StyleSheet, View, Image, Dimensions } from "react-native";
+import { StyleSheet, View, Dimensions } from "react-native";
 
 import { Card, Text, Dialog, Portal, Button } from "react-native-paper";
 import { useTranslation } from "react-i18next";
@@ -13,10 +13,8 @@ import { useAppContext } from "@/context/AppContext";
 import AutosizeImage from "@/helpers/AutoSizeImage";
 import AudioPlayer from "./HBAudioPlayer";
 
-import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
-import { ThemeProp } from "react-native-paper/lib/typescript/types";
-import { ViewProps } from "react-native/Libraries/Components/View/ViewPropTypes";
-import { ViewStyle } from "react-native/Libraries/StyleSheet/StyleSheetTypes";
+import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
+
 
 const { width: screenWidth } = Dimensions.get("screen");
 
@@ -96,18 +94,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
   const closeWordDialog = () => {
     setWordDialogVisible(false);
-  };
-
-  const stripWordsofSpecialCharacters = (
-    word: string,
-    charsToRemove: string
-  ): string => {
-    let newWord = word;
-    for (const char of charsToRemove) {
-      newWord = newWord.replace(char, "");
-    }
-
-    return newWord;
   };
 
   const highlightWords = (tokenizedPassage: string): string => {

@@ -19,8 +19,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { useAppContext } from "@/context/AppContext";
-
-
+import { useState } from "react";
 
 const TemplateTab: React.FC = () => {
   const theme = {
@@ -37,36 +36,36 @@ const TemplateTab: React.FC = () => {
 
   const colorScheme = useColorScheme();
 
-  const { language } = useAppContext();
+  const { language, passageText } = useAppContext();
+
 
   return (
-  
-    
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-          headerShown: false,
-          tabBarButton: HapticTab,
-          tabBarBackground: TabBarBackground,
-          tabBarStyle: Platform.select({
-            ios: {
-              // Use a transparent background on iOS to show the blur effect
-              position: "absolute",
-            },
-            default: {},
-          }),
-        }}
-      >
-        <Tabs.Screen
-          name="Templates"
-          options={{
-            title: t("Templates", { lng: language }),
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        headerShown: false,
+        tabBarButton: HapticTab,
+        tabBarBackground: TabBarBackground,
+        tabBarStyle: Platform.select({
+          ios: {
+            // Use a transparent background on iOS to show the blur effect
+            position: "absolute",
+          },
+          default: {},
+        }),
+      }}
+    >
+      <Tabs.Screen
+        name="Templates"
+        options={{
+          title: t("Templates", { lng: language }),
 
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="book" size={28} color={color} />
-            ),
-          }}
-        />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="book" size={28} color={color} />
+          ),
+        }}
+      />
+      {passageText !== "" ? (
         <Tabs.Screen
           name="TranslateAndRevise"
           options={{
@@ -76,27 +75,39 @@ const TemplateTab: React.FC = () => {
             ),
           }}
         />
+      ) : (
         <Tabs.Screen
-          name="Settings"
-          options={{
-            title: t("Settings", { lng: language }),
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="settings" size={28} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="ChangeLanguage"
+          name="TranslateAndRevise"
           options={{
             href: null,
-            title: t("Change Language", { lng: language }),
+            title: t("Translate", { lng: language }),
             tabBarIcon: ({ color }) => (
-              <Ionicons name="settings" size={28} color={color} />
+              <Ionicons name="language" size={28} color={color} />
             ),
           }}
         />
-      </Tabs>
-  
+      )}
+
+      <Tabs.Screen
+        name="Settings"
+        options={{
+          title: t("Settings", { lng: language }),
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="settings" size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="ChangeLanguage"
+        options={{
+          href: null,
+          title: t("Change Language", { lng: language }),
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="settings" size={28} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
   );
 };
 

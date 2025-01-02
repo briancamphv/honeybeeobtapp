@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { StyleSheet, View, Dimensions, TouchableOpacity } from "react-native";
 import * as FileSystem from "expo-file-system";
+import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 
 import {
   Appbar,
@@ -19,7 +20,12 @@ import { useAppContext } from "@/context/AppContext";
 
 import { useState, useRef, useEffect } from "react";
 
-import { copyAndWriteFile, listFiles, deleteFile } from "@/helpers/FileUtilies";
+import {
+  copyAndWriteFile,
+  listFiles,
+  deleteFile,
+  createDirectory,
+} from "@/helpers/FileUtilies";
 
 import audioRecorderPlayer, {
   PlayBackType,
@@ -45,8 +51,6 @@ const HBRecordBar: React.FC = () => {
     language,
   } = useAppContext();
 
-  
-
   const { t } = useTranslation();
 
   const [isRecording, setIsRecording] = useState(false);
@@ -64,14 +68,13 @@ const HBRecordBar: React.FC = () => {
     FileSystem.documentDirectory! +
     template +
     "/" +
-    title +
+    stripWordsofSpecialCharacters(title, ":") +
     "/" +
     translationStep +
     "/";
 
   const [hasStarted, setHasStarted] = useState<boolean>(false);
   const [draftRecordings, setDraftRecordings] = useState<string[]>([]);
-
 
   const [audioURI, setAudioUri] = useState<string>("");
 
@@ -100,6 +103,7 @@ const HBRecordBar: React.FC = () => {
   };
 
   const playDraftRecording = async (item: string) => {
+    isPlayRecording();
     var playFile = recordDir + item;
 
     audioRecorder.startPlayer(playFile);
@@ -108,9 +112,9 @@ const HBRecordBar: React.FC = () => {
   const deleteDraftRecording = async (item: string) => {
     var playFile = recordDir + item;
 
-    var newList = draftRecordings.filter((item) => item !== playFile)
-
-    setDraftRecordings((prevItems) => prevItems.filter((item) => item !== item))
+    setDraftRecordings((prevItems) =>
+      prevItems.filter((entry) => entry !== item)
+    );
 
     deleteFile(playFile);
   };
@@ -122,11 +126,23 @@ const HBRecordBar: React.FC = () => {
 
     var files = await listFiles(recordDir);
 
-    var destFile = recordDir + translationStep +  "_draftv" + (files.length + 1) + ".mp4";
+    var highestNum = 0;
+
+    files.map((item) => {
+      var itemSplit = item.split("_draftv");
+
+      var num = Number(itemSplit[itemSplit.length - 1].split(".")[0]);
+      if (num > highestNum) {
+        highestNum = num;
+      }
+    });
+
+    await createDirectory(recordDir);
+
+    var destFile =
+      recordDir + translationStep + "_draftv" + (highestNum + 1) + ".mp4";
 
     await copyAndWriteFile(result, destFile, () => null);
-
-    console.log("record file", result, destFile);
 
     setAudioUri(result);
     setHasStarted(false);
@@ -305,32 +321,32 @@ const HBRecordBar: React.FC = () => {
           visible={draftRecordsDialogVisible}
           onDismiss={closeDraftRecordsDialog}
         >
-          <Dialog.Title style={styles.dialogTitle}>{t("Recordings", {lng: language})}:</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>
+            {t("Recordings", { lng: language })}:
+          </Dialog.Title>
 
           <Dialog.Content>
             {draftRecordings.map((item, index) => {
               return (
                 <View
+                  key={index}
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
                     width: screenWidth - 100,
                     alignItems: "center",
+                    borderWidth: 1,
+                    borderColor: "#D3D3D3",
+                    padding: 20,
                   }}
                 >
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => playDraftRecording(item)}
-                  >
+                  <TouchableOpacity onPress={() => playDraftRecording(item)}>
                     <Icon color="black" source="play" size={25} />
                   </TouchableOpacity>
 
-                  <Text style={styles.dialogContent}>{item}</Text>
+                  <Text style={{ fontSize: 15 }}>{item}</Text>
 
-                  <TouchableOpacity
-                    key={index + 100}
-                    onPress={() => deleteDraftRecording(item)}
-                  >
+                  <TouchableOpacity onPress={() => deleteDraftRecording(item)}>
                     <Icon color="red" source="delete" size={25} />
                   </TouchableOpacity>
                 </View>
@@ -339,7 +355,9 @@ const HBRecordBar: React.FC = () => {
           </Dialog.Content>
 
           <Dialog.Actions>
-            <Button onPress={closeDraftRecordsDialog}>{t("Close", { lng: language })}</Button>
+            <Button onPress={closeDraftRecordsDialog}>
+              {t("Close", { lng: language })}
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

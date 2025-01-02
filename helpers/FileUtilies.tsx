@@ -1,5 +1,6 @@
 import * as FileSystem from "expo-file-system";
 
+
 import { unzip } from "react-native-zip-archive";
 
 export const unzipFile = async (
@@ -56,10 +57,33 @@ export async function listFiles(directoryUri: string): Promise<string[]> {
     const files = await FileSystem.readDirectoryAsync(directoryUri);
     return files;
   } catch (error) {
+    console.log("directoryUri",directoryUri)
     console.error("Error reading directory:", error);
     return [];
   }
 }
+
+export const createDirectory = async (directoryName:string) => {
+  try {
+
+   
+
+    const directoryUri =  directoryName; 
+    await FileSystem.makeDirectoryAsync(directoryUri, { intermediates: true }); 
+    console.log(`Directory created successfully at: ${directoryUri}`);
+  } catch (error) {
+    console.error('Error creating directory:', error);
+  }
+};
+
+export const createFileFromString = async (filePath: string, fileContent:string) => {
+  try {
+    await FileSystem.writeAsStringAsync(filePath, fileContent);
+    console.log(`File created successfully at: ${filePath}`);
+  } catch (error) {
+    console.error('Error creating file:', error);
+  }
+};
 
 const fileUtilities = () => {
     
