@@ -1,34 +1,29 @@
 import React, { useState, useRef } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
-import { Alert } from "react-native";
 
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import {
-  Card,
-  Title,
-  Appbar,
-  IconButton,
-  MD3Colors,
-  Button,
-  Text,
-} from "react-native-paper";
-import GetTemplate from "@/components/GetTemplate";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Card, Title, Appbar } from "react-native-paper";
+
+import ChapterCards from "@/components/ChapterCards";
 import { useNavigation } from "expo-router";
 
 import { useTranslation } from "react-i18next";
 import BooksOfBible from "../data/BooksOfBible";
 import ChaptersOfBible from "../data/ChaptersOfBible";
 import { useAppContext } from "@/context/AppContext";
-import { DrawerActions } from "@react-navigation/native";
 
 const BibleBookList: React.FC = () => {
+
+
+
   const scrollViewRef = useRef<ScrollView>(null);
+
+  const { language } = useAppContext();
 
   const handleScroll = (event: {
     nativeEvent: { contentOffset: { y: number } };
   }) => {
     if (areBooksVisible) {
-      
       setCurrentScrollY(event.nativeEvent.contentOffset.y);
     }
   };
@@ -43,10 +38,7 @@ const BibleBookList: React.FC = () => {
   };
 
   const scrollToPrevPos = () => {
-
     if (scrollViewRef.current) {
-
-    
       scrollViewRef.current.scrollTo({
         y: currentScrollY, // Scroll to the prev (y = prev scroll pos)
         animated: true, // Add smooth animation
@@ -54,24 +46,13 @@ const BibleBookList: React.FC = () => {
     }
   };
 
-  const navigation = useNavigation();
+  
   function handleBookPress(item: string) {
     setBibleBook(item);
     setAreBooksVisible(false);
     setAreChaptersVisible(true);
     scrollToTop();
   }
-
-  function handleChapterPress(item: string) {
-    setStep("translate");
-    loadTemplate(item).then(() => {
-      navigation.dispatch(DrawerActions.jumpTo("TranslateAndRevise"));
-      setAreChaptersVisible(false);
-      setAreBooksVisible(true);
-    });
-  }
-
-  const { loadTemplate, language, setStep } = useAppContext();
 
   const { t } = useTranslation();
 
@@ -87,32 +68,24 @@ const BibleBookList: React.FC = () => {
       onPress={() => handleBookPress(item)}
     >
       <Card.Content>
-        <Title numberOfLines={2} style={styles.bookTitle}>
-          {t(item, { lng: language })}
-        </Title>
+        <View style={styles.container}>
+          <Title numberOfLines={2} style={styles.bookTitle}>
+            {t(item, { lng: language })}
+          </Title>
+        </View>
       </Card.Content>
     </Card>
   );
 
   const renderChapters = (item: string, index: number) => (
-    <Card
-      key={index}
-      style={styles.chapters}
-      onPress={() => handleChapterPress(item)}
-    >
-      <Card.Content>
-        <Title style={styles.chapterTitle}>{t(item, { lng: language })}</Title>
-        <View style={styles.iconContainer}>
-          <IconButton
-            icon="download"
-            iconColor={"blue"}
-            size={25}
-            onPress={() => Alert.alert("Coming Soon", "Download is not currently working, use Import instead.")}
-          />
-          <GetTemplate book={bibleBook} template={item} />
-        </View>
-      </Card.Content>
-    </Card>
+    <ChapterCards
+      book={bibleBook}
+      template={item}
+      index={index}
+      language={language}
+      setAreChaptersVisible={setAreChaptersVisible}
+      setAreBooksVisible={setAreBooksVisible}
+    />
   );
 
   return (
@@ -137,10 +110,11 @@ const BibleBookList: React.FC = () => {
         </Appbar.Header>
 
         <ScrollView
+          bounces={false}
           ref={scrollViewRef}
           onScroll={handleScroll}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 150 }}
+          contentContainerStyle={{ paddingBottom: 300 }}
         >
           {areBooksVisible && (
             <View style={{ flex: 1, flexDirection: "row", flexWrap: "wrap" }}>
@@ -178,6 +152,10 @@ const styles = StyleSheet.create({
     margin: 2,
     borderRadius: 10,
     alignContent: "center",
+  },
+  container: {
+    alignItems: "center",
+    wordWrap: "2",
   },
   bookTitle: {
     fontSize: 10,

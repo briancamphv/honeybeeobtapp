@@ -3,13 +3,13 @@ import { useEffect, useRef } from "react";
 
 import { useAppContext } from "@/context/AppContext";
 
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, SafeAreaView } from "react-native";
 
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "expo-router";
 import HBAppBar from "@/components/HBAppBar";
 import HBScriptureCard from "@/components/HBScriptureCard";
-// import HBAudioPlayer from "@/components/HBAudioPlayer";
+
 import AudioPlayer from "@/components/HBAudioPlayer";
 import HBRecordBar from "@/components/HBRecordBar";
 
@@ -39,7 +39,6 @@ const TranslateAndRevise: React.FC = () => {
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
- 
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -51,7 +50,6 @@ const TranslateAndRevise: React.FC = () => {
   });
 
   const onGestureEvent = (event: any) => {
-   
     // console.log("event",event)
     translateX.value = withSpring(event.translationX);
     //translateY.value = withSpring(event.translationY);
@@ -66,8 +64,6 @@ const TranslateAndRevise: React.FC = () => {
   // ).then((val) => console.log(val));
 
   const onSwipe = (event: any) => {
-   
-    
     if (event.translationX < 0) {
       // Swipe right
 
@@ -85,24 +81,29 @@ const TranslateAndRevise: React.FC = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GestureDetector
-        gesture={Gesture.Pan().onChange(onGestureEvent).onEnd(onSwipe).runOnJS(true)}
+        gesture={Gesture.Pan()
+          .onChange(onGestureEvent)
+          .onEnd(onSwipe)
+          .runOnJS(true)}
       >
-        <Animated.View
-          style={[
-            { flex: 1, justifyContent: "center", alignItems: "center" },
-            animatedStyle,
-          ]}
-        >
-          <HBAppBar />
-          <HBScriptureCard
-            imageURI={imageURI}
-            passageText={passageText}
-            title={title}
-            notes={notes}
-          />
-          <AudioPlayer audioUri={audioURI} />
-          <HBRecordBar />
-        </Animated.View>
+        <SafeAreaView style={styles.container}>
+          <Animated.View
+            style={[
+              { flex: 1, justifyContent: "center", alignItems: "center" },
+              animatedStyle,
+            ]}
+          >
+            <HBAppBar />
+            <HBScriptureCard
+              imageURI={imageURI}
+              passageText={passageText}
+              title={title}
+              notes={notes}
+              audioURI={audioURI}
+            />
+            <HBRecordBar />
+          </Animated.View>
+        </SafeAreaView>
       </GestureDetector>
     </GestureHandlerRootView>
   );

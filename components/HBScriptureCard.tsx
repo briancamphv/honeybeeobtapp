@@ -15,14 +15,20 @@ import AudioPlayer from "./HBAudioPlayer";
 
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 
+import { Platform } from "react-native";
+
+
 
 const { width: screenWidth } = Dimensions.get("screen");
+
+
 
 interface HBScriptureCard {
   imageURI: string;
   passageText: string;
   title: string;
   notes: any[];
+  audioURI: string;
 }
 
 interface HBScriptureNote {
@@ -45,6 +51,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   passageText,
   title,
   notes,
+  audioURI,
 }) => {
   const [highlightedWords, setHighlightedWords] = useState<string[]>([]);
   const [highlightedPhrases, setHighlightedPhrases] = useState<any[]>([]);
@@ -162,8 +169,9 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
   return (
     <>
-      <Card>
+      <Card style={styles.card}>
         <Card.Cover source={{ uri: imageURI }} />
+        <AudioPlayer audioUri={audioURI} />
 
         <Card.Content>
           <Text variant="titleLarge">{title}</Text>
@@ -381,6 +389,11 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 };
 
 const styles = StyleSheet.create({
+  
+  card: {
+    flex: Platform.OS === 'ios' ? .85: 1,
+  },
+
   title: {
     backgroundColor: "red",
   },

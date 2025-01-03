@@ -97,7 +97,7 @@ const HBAppBar: React.FC = () => {
     <>
       <View style={styles.title}>
         <WorkFlowMenu />
-        <TouchableOpacity onPress={openHelpDialog}>
+        <TouchableOpacity style ={{paddingRight:20}} onPress={openHelpDialog}>
           <Icon color="white" source="help" size={25} />
         </TouchableOpacity>
       </View>
@@ -109,7 +109,9 @@ const HBAppBar: React.FC = () => {
             <Text>Help</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={closeHelpDialog}>{t("Close", { lng: language })}</Button>
+            <Button onPress={closeHelpDialog}>
+              {t("Close", { lng: language })}
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -122,12 +124,13 @@ const styles = StyleSheet.create({
     backgroundColor: "red",
     marginBottom: 5,
     flexDirection: "row",
-    alignItems: "baseline",
+    alignItems: "baseline"
+  
   },
 
   workflow: {
     width: 350,
-    padding: 20,
+    padding: 2,
   },
 });
 

@@ -89,7 +89,9 @@ const HBRecordBar: React.FC = () => {
     if (status.isFinished) {
       setAudioLoaded(false);
       setPlaying(false);
+      setHasStarted(false);
       isNotPlayRecording();
+      //audioRecorder.seekToPlayer(0)
       // setCurrentPosition(0);
     }
   };
@@ -124,6 +126,7 @@ const HBRecordBar: React.FC = () => {
 
     const result = await audioRecorder.stopRecorder();
 
+
     var files = await listFiles(recordDir);
 
     var highestNum = 0;
@@ -151,7 +154,7 @@ const HBRecordBar: React.FC = () => {
   const onStartPlay = async () => {
     isPlayRecording();
 
-    console.log("audioURI", audioURI);
+   
 
     const msg = await audioRecorder.startPlayer(audioURI);
     setPlaying(true);
@@ -284,36 +287,19 @@ const HBRecordBar: React.FC = () => {
 
   return (
     <>
-      <Appbar.Header elevated={true} style={styles.title}>
-        <Appbar.Content title="Recording" color="white" />
-        <Appbar.Action
-          icon={isRecording ? "stop" : "microphone"}
-          size={30}
-          color="white"
-          onPress={isRecording ? onStopRecord : onStartRecord}
-        />
+      <View style={styles.title}>
+        <TouchableOpacity style={{ paddingRight: 20 }} onPress={isRecording ? onStopRecord : onStartRecord}>
+          <Icon color="white" source={isRecording ? "stop" : "microphone"} size={30} />
+        </TouchableOpacity>
+        <TouchableOpacity style={{ paddingRight: 20 }} onPress={onPausePlay}>
+          <Icon color="white" source={playing ? "pause" : "play"} size={30} />
+        </TouchableOpacity>
+        <TouchableOpacity style={{ paddingRight: 20 }} onPress={openRecordingFolder}>
+          <Icon color="white" source={"folder-edit-outline"} size={30} />
+        </TouchableOpacity>
+      </View>
 
-        <Appbar.Action
-          icon={playing ? "pause" : "play"}
-          size={30}
-          color="white"
-          onPress={onPausePlay}
-        />
-
-        <Appbar.Action
-          icon="replay"
-          size={30}
-          color="white"
-          onPress={onStartPlay}
-        />
-
-        <Appbar.Action
-          icon="folder-edit-outline"
-          size={30}
-          color="white"
-          onPress={openRecordingFolder}
-        />
-      </Appbar.Header>
+     
 
       <Portal>
         <Dialog
@@ -326,7 +312,7 @@ const HBRecordBar: React.FC = () => {
           </Dialog.Title>
 
           <Dialog.Content>
-            {draftRecordings.map((item, index) => {
+            {draftRecordings.sort().map((item, index) => {
               return (
                 <View
                   key={index}
@@ -369,14 +355,15 @@ const styles = StyleSheet.create({
   title: {
     backgroundColor: "blue",
     justifyContent: "space-between",
-    height: 50,
-    marginBottom: 5,
+    padding: 10,
+    margin: 3,
     color: "white",
+    flexDirection: "row",
+    width: "100%"
   },
 
   titleContainer: {
-    flex: 1,
-    flexDirection: "row",
+   
     alignItems: "center",
   },
 

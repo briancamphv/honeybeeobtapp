@@ -3,6 +3,9 @@ import React, { useState, useEffect, FC } from "react";
 import { View } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import { listFiles } from "@/helpers/FileUtilies";
+import { Alert } from "react-native";
+import { useTranslation } from "react-i18next";
+import { useAppContext } from "@/context/AppContext";
 
 import {
   copyAndWriteFile,
@@ -23,12 +26,20 @@ interface FileSelectionResult {
 interface GetTemplate {
   book: string;
   template: string;
+  setBackGroundColor: (value: string) => void;
 }
 
-const GetTemplate: React.FC<GetTemplate> = ({ book, template }) => {
+const GetTemplate: React.FC<GetTemplate> = ({
+  book,
+  template,
+  setBackGroundColor,
+}) => {
   const [selectedFile, setSelectedFile] = useState<FileSelectionResult | null>(
     null
   );
+
+  const { t } = useTranslation();
+  const { language } = useAppContext();
 
   const [templatedDownloaded, setTemplatedDownloaded] =
     useState<boolean>(false);
@@ -47,6 +58,7 @@ const GetTemplate: React.FC<GetTemplate> = ({ book, template }) => {
 
     if (await fileExists(fileUri)) {
       unzipFile(fileUri, dest).then(() => deleteFile(fileUri));
+      setBackGroundColor("lightgreen");
     }
 
     return;
@@ -54,6 +66,20 @@ const GetTemplate: React.FC<GetTemplate> = ({ book, template }) => {
 
   useEffect(() => {
     if (selectedFile === null) {
+      return;
+    }
+
+    if (!selectedFile!.name.includes(template)) {
+      Alert.alert(
+        t("Wrong Template", { lng: language }),
+        t(
+          "The template file you have selected to import does not match the template you selected",
+          {
+            lng: language,
+          }
+        ) + "."
+      );
+
       return;
     }
 
