@@ -78,7 +78,7 @@ const BibleBookList: React.FC = () => {
   );
 
   const renderChapters = (item: string, index: number) => (
-    <ChapterCards
+    <ChapterCards key={index}
       book={bibleBook}
       template={item}
       index={index}

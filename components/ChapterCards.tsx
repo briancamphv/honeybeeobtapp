@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useAppContext } from "@/context/AppContext";
 import { DrawerActions } from "@react-navigation/native";
 import { Alert } from "react-native";
+import { useTheme } from "react-native-paper";
 
 interface ChapterCards {
   book: string;
@@ -37,7 +38,11 @@ const ChapterCards: React.FC<ChapterCards> = ({
   const [templatedDownloaded, setTemplatedDownloaded] =
     useState<boolean>(false);
 
-  const [backGroundColor, setBackGroundColor] = useState<string>("lightgray");
+  const theme = useTheme();
+
+  const [backGroundColor, setBackGroundColor] = useState<string>(
+    theme.colors.surface
+  );
 
   const navigation = useNavigation();
   const { t } = useTranslation();
@@ -50,7 +55,7 @@ const ChapterCards: React.FC<ChapterCards> = ({
       setBackGroundColor("lightgreen");
       setTemplatedDownloaded(true);
     } else {
-      setBackGroundColor("lightgray");
+      setBackGroundColor(theme.colors.surface);
       setTemplatedDownloaded(false);
     }
   });
@@ -74,16 +79,13 @@ const ChapterCards: React.FC<ChapterCards> = ({
     });
   }
 
-
-
   return (
     <>
-      <Card key={index}
-       
+      <Card
         style={[styles.chapters, { backgroundColor: backGroundColor }]}
         onPress={() => handleChapterPress(template)}
       >
-        <Card.Content >
+        <Card.Content>
           <View style={styles.container}>
             <Title style={styles.chapterTitle}>
               {t(template, { lng: language })}
@@ -91,7 +93,11 @@ const ChapterCards: React.FC<ChapterCards> = ({
           </View>
           <View style={styles.iconContainer}>
             <DownloadTemplate book={book} template={template} />
-            <GetTemplate book={book} template={template} setBackGroundColor={setBackGroundColor} />
+            <GetTemplate
+              book={book}
+              template={template}
+              setBackGroundColor={setBackGroundColor}
+            />
           </View>
         </Card.Content>
       </Card>
