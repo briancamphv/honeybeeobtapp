@@ -97,6 +97,8 @@ const ChapterCards: React.FC<ChapterCards> = ({
               book={book}
               template={template}
               setBackGroundColor={setBackGroundColor}
+              setAreChaptersVisible = {setAreChaptersVisible}
+              setAreBooksVisible = {setAreBooksVisible}
             />
           </View>
         </Card.Content>
@@ -109,6 +111,7 @@ export default ChapterCards;
 const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
+    justifyContent: "space-evenly",
   },
   books: {
     width: 120, // Adjust the width as needed

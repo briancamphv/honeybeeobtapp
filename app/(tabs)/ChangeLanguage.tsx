@@ -1,7 +1,11 @@
 import React from "react";
 
-import { List, MD3Colors } from "react-native-paper";
+import { useTranslation } from "react-i18next";
+
+import { Divider, List, MD3Colors } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
+
+import { SafeAreaView, View } from "react-native";
 
 import Languages, { LanguageInterface } from "../data/Languages";
 
@@ -14,25 +18,36 @@ const ChangeLanguage: React.FC = () => {
 
   const navigation = useNavigation();
 
+  const { language } = useAppContext();
+
+  const { t } = useTranslation();
+
   return (
-    <List.Section>
-      <List.Subheader>Settings</List.Subheader>
+    <SafeAreaView>
+      <List.Section title={t("Choose Language", { lng: language })}>
+        
 
-      {Languages.map((item: LanguageInterface, index) => (
-        <List.Item
-          key={index}
-          onPress={() => {
-            languageSwitcher(item.languageCode);
+        {Languages.map((item: LanguageInterface, index) => (
+          <View key={index}>
+            <List.Item
+              
+              onPress={() => {
+                languageSwitcher(item.languageCode);
 
-            navigation.dispatch(DrawerActions.jumpTo("Settings"));
-          }}
-          title={item.language}
-          left={() => (
-            <List.Icon icon={() => <Ionicons name="language" size={24} />} />
-          )}
-        />
-      ))}
-    </List.Section>
+                navigation.dispatch(DrawerActions.jumpTo("Settings"));
+              }}
+              title={t(item.language, { lng: language })}
+              left={() => (
+                <List.Icon
+                  icon={() => <Ionicons name="language" size={24} />}
+                />
+              )}
+            />
+            <Divider />
+          </View>
+        ))}
+      </List.Section>
+    </SafeAreaView>
   );
 };
 

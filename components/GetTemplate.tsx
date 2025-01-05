@@ -6,6 +6,8 @@ import { listFiles } from "@/helpers/FileUtilies";
 import { Alert } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@/context/AppContext";
+import { useNavigation } from "expo-router";
+import { DrawerActions } from "@react-navigation/native";
 
 import {
   copyAndWriteFile,
@@ -27,19 +29,24 @@ interface GetTemplate {
   book: string;
   template: string;
   setBackGroundColor: (value: string) => void;
+  setAreChaptersVisible: (value: boolean) => void;
+  setAreBooksVisible: (value: boolean) => void;
 }
 
 const GetTemplate: React.FC<GetTemplate> = ({
   book,
   template,
   setBackGroundColor,
+  setAreChaptersVisible,
+  setAreBooksVisible
 }) => {
   const [selectedFile, setSelectedFile] = useState<FileSelectionResult | null>(
     null
   );
 
+  const navigation = useNavigation();
   const { t } = useTranslation();
-  const { language } = useAppContext();
+  const { language, loadTemplate } = useAppContext();
 
   const [templatedDownloaded, setTemplatedDownloaded] =
     useState<boolean>(false);
@@ -49,6 +56,7 @@ const GetTemplate: React.FC<GetTemplate> = ({
   listFiles(recordDir).then((files) => {
     if (files.length > 0) {
       setTemplatedDownloaded(true);
+      setBackGroundColor("lightgreen");
     }
   });
 
@@ -57,9 +65,24 @@ const GetTemplate: React.FC<GetTemplate> = ({
     const dest = `${FileSystem.documentDirectory}`;
 
     if (await fileExists(fileUri)) {
-      unzipFile(fileUri, dest).then(() => deleteFile(fileUri));
-      setBackGroundColor("lightgreen");
+      unzipFile(fileUri, dest).then(() => {
+        deleteFile(fileUri);
+        Alert.alert(
+          t("Template", { lng: language }),
+          t("You have successfully imported the template", {
+            lng: language,
+          }) + "."
+        );
+
+        loadTemplate(template).then(() => {
+          navigation.dispatch(DrawerActions.jumpTo("TranslateAndRevise"));
+        });
+        setAreBooksVisible(true)
+        setAreChaptersVisible(false)
+      });
     }
+
+    setBackGroundColor("lightgreen");
 
     return;
   };
@@ -73,7 +96,7 @@ const GetTemplate: React.FC<GetTemplate> = ({
       Alert.alert(
         t("Wrong Template", { lng: language }),
         t(
-          "The template file you have selected to import does not match the template you selected",
+          "The template file you have selected to import does not match the template you picked",
           {
             lng: language,
           }

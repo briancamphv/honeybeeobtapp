@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 
 import { useAppContext } from "@/context/AppContext";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 
 import {
   copyAndWriteFile,
@@ -186,6 +186,8 @@ const HBRecordBar: React.FC = () => {
   };
 
   const closeDraftRecordsDialog = () => {
+
+    disableAudio();
     setDraftRecordsDialogVisible(false);
   };
 
