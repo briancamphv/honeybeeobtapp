@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, Title, Appbar } from "react-native-paper";
 
 import ChapterCards from "@/components/ChapterCards";
-import { useNavigation } from "expo-router";
+import BookCards from "@/components/BookCards";
 
 import { useTranslation } from "react-i18next";
 import BooksOfBible from "../data/BooksOfBible";
@@ -13,9 +13,6 @@ import ChaptersOfBible from "../data/ChaptersOfBible";
 import { useAppContext } from "@/context/AppContext";
 
 const BibleBookList: React.FC = () => {
-
-
-
   const scrollViewRef = useRef<ScrollView>(null);
 
   const { language } = useAppContext();
@@ -46,7 +43,6 @@ const BibleBookList: React.FC = () => {
     }
   };
 
-  
   function handleBookPress(item: string) {
     setBibleBook(item);
     setAreBooksVisible(false);
@@ -62,23 +58,12 @@ const BibleBookList: React.FC = () => {
   const [currentScrollY, setCurrentScrollY] = useState<number>(0);
 
   const renderBooks = (item: string, index: number) => (
-    <Card
-      key={index}
-      style={styles.books}
-      onPress={() => handleBookPress(item)}
-    >
-      <Card.Content>
-        <View style={styles.container}>
-          <Title numberOfLines={2} style={styles.bookTitle}>
-            {t(item, { lng: language })}
-          </Title>
-        </View>
-      </Card.Content>
-    </Card>
+    <BookCards key={index} item={item} index={index} handleBookPress={handleBookPress} />
   );
 
   const renderChapters = (item: string, index: number) => (
-    <ChapterCards key={index}
+    <ChapterCards
+      key={index}
       book={bibleBook}
       template={item}
       index={index}

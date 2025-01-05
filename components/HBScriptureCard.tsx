@@ -4,7 +4,13 @@ import * as FileSystem from "expo-file-system";
 
 import checkFileType from "@/helpers/FileTypeCheck";
 
-import { StyleSheet, View, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Dimensions,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
 
 import { Card, Text, Dialog, Portal, Button } from "react-native-paper";
 import { useTranslation } from "react-i18next";
@@ -17,11 +23,7 @@ import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 
 import { Platform } from "react-native";
 
-
-
 const { width: screenWidth } = Dimensions.get("screen");
-
-
 
 interface HBScriptureCard {
   imageURI: string;
@@ -69,7 +71,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     });
 
   const { language } = useAppContext();
-  
 
   const [wordDialogNote, setWordDialogNote] = useState<WordNote>();
   const [wordDialogTitle, setWordDialogTitle] = useState<String>("");
@@ -221,89 +222,103 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           visible={exegeticalDialogVisible}
           onDismiss={closeExegeticalDialog}
         >
-          <Dialog.Title style={styles.dialogTitle}>{t("Phrase", { lng: language })}:</Dialog.Title>
+          <ScrollView
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 50 }}
+          >
+            <Dialog.Title style={styles.dialogTitle}>
+              {t("Phrase", { lng: language })}:
+            </Dialog.Title>
 
-          <Dialog.Content>
-            <Text style={styles.dialogContent}>
-              {exegeticalDialogNote.words}
-            </Text>
-          </Dialog.Content>
+            <Dialog.Content>
+              <Text style={styles.dialogContent}>
+                {exegeticalDialogNote.words}
+              </Text>
+            </Dialog.Content>
 
-          {exegeticalDialogNote.av &&
-          checkFileType(exegeticalDialogNote.av) === "image" ? (
-            <AutosizeImage
-              screenWidth={screenWidth - 50}
-              source={{
-                uri:
+            {exegeticalDialogNote.av &&
+            checkFileType(exegeticalDialogNote.av) === "image" ? (
+              <AutosizeImage
+                screenWidth={screenWidth - 50}
+                source={{
+                  uri:
+                    FileSystem.documentDirectory +
+                    template +
+                    "/audioVisual/" +
+                    exegeticalDialogNote.av,
+                }}
+              />
+            ) : (
+              ""
+            )}
+
+            <Dialog.Title style={styles.dialogTitle}>
+              {t("Exegetical Notes", { lng: language })}:
+            </Dialog.Title>
+
+            <Dialog.Content>
+              <Text style={styles.dialogContent}>
+                {exegeticalDialogNote.BEN}
+              </Text>
+            </Dialog.Content>
+
+            {exegeticalDialogNote.comment ? (
+              <Dialog.Title style={styles.dialogTitle}>
+                {t("Commentary", { lng: language })}:
+              </Dialog.Title>
+            ) : (
+              ""
+            )}
+
+            {exegeticalDialogNote.comment ? (
+              <Dialog.Content>
+                <Text style={styles.dialogContent}>
+                  {exegeticalDialogNote.comment}
+                </Text>
+              </Dialog.Content>
+            ) : (
+              ""
+            )}
+
+            {exegeticalDialogNote.parallelRef ? (
+              <Dialog.Title style={styles.dialogTitle}>
+                {t("Parallel References", { lng: language })}:
+              </Dialog.Title>
+            ) : (
+              ""
+            )}
+
+            {exegeticalDialogNote.parallelRef ? (
+              <Dialog.Content>
+                <Text style={styles.dialogContent}>
+                  {exegeticalDialogNote.parallelRef}
+                </Text>
+              </Dialog.Content>
+            ) : (
+              ""
+            )}
+
+            {exegeticalDialogNote.av &&
+            checkFileType(exegeticalDialogNote.av) === "audio" ? (
+              <AudioPlayer
+                audioUri={
                   FileSystem.documentDirectory +
                   template +
                   "/audioVisual/" +
-                  exegeticalDialogNote.av,
-              }}
-            />
-          ) : (
-            ""
-          )}
+                  exegeticalDialogNote.av
+                }
+              />
+            ) : (
+              ""
+            )}
 
-          <Dialog.Title style={styles.dialogTitle}>
-            {t("Exegetical Notes", { lng: language })}:
-          </Dialog.Title>
-
-          <Dialog.Content>
-            <Text style={styles.dialogContent}>{exegeticalDialogNote.BEN}</Text>
-          </Dialog.Content>
-
-          {exegeticalDialogNote.comment ? (
-            <Dialog.Title style={styles.dialogTitle}>{t("Commentary", { lng: language })}:</Dialog.Title>
-          ) : (
-            ""
-          )}
-
-          {exegeticalDialogNote.comment ? (
-            <Dialog.Content>
-              <Text style={styles.dialogContent}>
-                {exegeticalDialogNote.comment}
-              </Text>
-            </Dialog.Content>
-          ) : (
-            ""
-          )}
-
-          {exegeticalDialogNote.parallelRef ? (
-            <Dialog.Title style={styles.dialogTitle}>
-              {t("Parallel References", { lng: language })}:
-            </Dialog.Title>
-          ) : (
-            ""
-          )}
-
-          {exegeticalDialogNote.parallelRef ? (
-            <Dialog.Content>
-              <Text style={styles.dialogContent}>
-                {exegeticalDialogNote.parallelRef}
-              </Text>
-            </Dialog.Content>
-          ) : (
-            ""
-          )}
-
-          {exegeticalDialogNote.av &&
-          checkFileType(exegeticalDialogNote.av) === "audio" ? (
-            <AudioPlayer
-              audioUri={
-                FileSystem.documentDirectory +
-                template +
-                "/audioVisual/" +
-                exegeticalDialogNote.av
-              }
-            />
-          ) : (
-            ""
-          )}
-
-          <Dialog.Actions>
-            <Button onPress={closeExegeticalDialog}>{t("Close", { lng: language })}</Button>
-          </Dialog.Actions>
+            <Dialog.Actions>
+              <Button onPress={closeExegeticalDialog}>
+                {t("Close", { lng: language })}
+              </Button>
+            </Dialog.Actions>
+          </ScrollView>
         </Dialog>
       </Portal>
 
@@ -313,75 +328,89 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           visible={wordDialogVisible}
           onDismiss={closeWordDialog}
         >
-          <Dialog.Title style={styles.dialogTitle}>{t("Word Study", { lng: language })}:</Dialog.Title>
-
-          <Dialog.Content>
-            <Text style={styles.dialogContent}>{wordDialogTitle}</Text>
-          </Dialog.Content>
-
-          <Dialog.Title style={styles.dialogTitle}>{t("Meaning", { lng: language })}:</Dialog.Title>
-
-          <Dialog.Content>
-            <Text style={styles.dialogContent}>{wordDialogNote?.meaning}</Text>
-          </Dialog.Content>
-
-          {wordDialogNote?.altFormSym ? (
+          <ScrollView
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 50 }}
+          >
             <Dialog.Title style={styles.dialogTitle}>
-              {t("Alternate Forms or Synonyms", { lng: language })}:
+              {t("Word Study", { lng: language })}:
             </Dialog.Title>
-          ) : (
-            ""
-          )}
 
-          {wordDialogNote?.altFormSym ? (
+            <Dialog.Content>
+              <Text style={styles.dialogContent}>{wordDialogTitle}</Text>
+            </Dialog.Content>
+
+            <Dialog.Title style={styles.dialogTitle}>
+              {t("Meaning", { lng: language })}:
+            </Dialog.Title>
+
             <Dialog.Content>
               <Text style={styles.dialogContent}>
-                {wordDialogNote.altFormSym}
+                {wordDialogNote?.meaning}
               </Text>
             </Dialog.Content>
-          ) : (
-            ""
-          )}
 
-          {wordDialogNote?.otherLangEx ? (
-            <Dialog.Title style={styles.dialogTitle}>
-              {t("Other Language Examples", { lng: language })}:
-            </Dialog.Title>
-          ) : (
-            ""
-          )}
+            {wordDialogNote?.altFormSym ? (
+              <Dialog.Title style={styles.dialogTitle}>
+                {t("Alternate Forms or Synonyms", { lng: language })}:
+              </Dialog.Title>
+            ) : (
+              ""
+            )}
 
-          {wordDialogNote?.otherLangEx ? (
-            <Dialog.Content>
-              <Text style={styles.dialogContent}>
-                {wordDialogNote.otherLangEx}
-              </Text>
-            </Dialog.Content>
-          ) : (
-            ""
-          )}
+            {wordDialogNote?.altFormSym ? (
+              <Dialog.Content>
+                <Text style={styles.dialogContent}>
+                  {wordDialogNote.altFormSym}
+                </Text>
+              </Dialog.Content>
+            ) : (
+              ""
+            )}
 
-          {wordDialogNote?.relatedTerms ? (
-            <Dialog.Title style={styles.dialogTitle}>
-              {t("Related Terms", { lng: language })}:
-            </Dialog.Title>
-          ) : (
-            ""
-          )}
+            {wordDialogNote?.otherLangEx ? (
+              <Dialog.Title style={styles.dialogTitle}>
+                {t("Other Language Examples", { lng: language })}:
+              </Dialog.Title>
+            ) : (
+              ""
+            )}
 
-          {wordDialogNote?.relatedTerms ? (
-            <Dialog.Content>
-              <Text style={styles.dialogContent}>
-                {wordDialogNote.relatedTerms}
-              </Text>
-            </Dialog.Content>
-          ) : (
-            ""
-          )}
+            {wordDialogNote?.otherLangEx ? (
+              <Dialog.Content>
+                <Text style={styles.dialogContent}>
+                  {wordDialogNote.otherLangEx}
+                </Text>
+              </Dialog.Content>
+            ) : (
+              ""
+            )}
 
-          <Dialog.Actions>
-            <Button onPress={closeWordDialog}>{t("Close", { lng: language })}</Button>
-          </Dialog.Actions>
+            {wordDialogNote?.relatedTerms ? (
+              <Dialog.Title style={styles.dialogTitle}>
+                {t("Related Terms", { lng: language })}:
+              </Dialog.Title>
+            ) : (
+              ""
+            )}
+
+            {wordDialogNote?.relatedTerms ? (
+              <Dialog.Content>
+                <Text style={styles.dialogContent}>
+                  {wordDialogNote.relatedTerms}
+                </Text>
+              </Dialog.Content>
+            ) : (
+              ""
+            )}
+
+            <Dialog.Actions>
+              <Button onPress={closeWordDialog}>
+                {t("Close", { lng: language })}
+              </Button>
+            </Dialog.Actions>
+          </ScrollView>
         </Dialog>
       </Portal>
     </>
@@ -389,9 +418,8 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 };
 
 const styles = StyleSheet.create({
-  
   card: {
-    flex: Platform.OS === 'ios' ? .85: 1,
+    flex: Platform.OS === "ios" ? 0.85 : 1,
   },
 
   title: {

@@ -46,7 +46,7 @@ const GetTemplate: React.FC<GetTemplate> = ({
 
   const navigation = useNavigation();
   const { t } = useTranslation();
-  const { language, loadTemplate } = useAppContext();
+  const { language, loadTemplate, setStep } = useAppContext();
 
   const [templatedDownloaded, setTemplatedDownloaded] =
     useState<boolean>(false);
@@ -74,6 +74,7 @@ const GetTemplate: React.FC<GetTemplate> = ({
           }) + "."
         );
 
+        setStep("Translate");
         loadTemplate(template).then(() => {
           navigation.dispatch(DrawerActions.jumpTo("TranslateAndRevise"));
         });

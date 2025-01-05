@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { StyleSheet, View, Alert, TouchableOpacity } from "react-native";
+import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 
 import {
   List,
@@ -97,22 +97,28 @@ const HBAppBar: React.FC = () => {
     <>
       <View style={styles.title}>
         <WorkFlowMenu />
-        <TouchableOpacity style ={{paddingRight:20}} onPress={openHelpDialog}>
+        <TouchableOpacity style={{ paddingRight: 20 }} onPress={openHelpDialog}>
           <Icon color="white" source="help" size={25} />
         </TouchableOpacity>
       </View>
 
       <Portal>
         <Dialog visible={helpDialogVisible} onDismiss={closeHelpDialog}>
-          <Dialog.Title>{t("Help", { lng: language })}</Dialog.Title>
-          <Dialog.Content>
-            <Text>Help</Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={closeHelpDialog}>
-              {t("Close", { lng: language })}
-            </Button>
-          </Dialog.Actions>
+          <ScrollView
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 50 }}
+          >
+            <Dialog.Title>{t("Help", { lng: language })}</Dialog.Title>
+            <Dialog.Content>
+              <Text>Help</Text>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={closeHelpDialog}>
+                {t("Close", { lng: language })}
+              </Button>
+            </Dialog.Actions>
+          </ScrollView>
         </Dialog>
       </Portal>
     </>
@@ -124,8 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: "red",
     marginBottom: 5,
     flexDirection: "row",
-    alignItems: "baseline"
-  
+    alignItems: "baseline",
   },
 
   workflow: {
