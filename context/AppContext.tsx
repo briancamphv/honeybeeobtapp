@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
 import { useAssets } from "expo-asset";
 import { useTranslation } from "react-i18next";
+import { fileExists } from "@/helpers/FileUtilies";
+import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 
 // Define the type for the context values
 
@@ -24,7 +26,9 @@ interface AppContextType {
   isPlayRecording: () => void;
   isNotPlayRecording: () => void;
   setStep: (step: string) => void;
-  languageSwitcher: (lng:string) => void;
+  languageSwitcher: (lng: string) => void;
+  changeImage: (uri: string) => void;
+  revertImage: () => void,
   language: string;
   translationStep: string;
   template: string;
@@ -128,12 +132,37 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         templateJSON.passages[pageNumber].audio
     );
 
-    setImageURI(
-      FileSystem.documentDirectory +
+    var currentTitle =
+      templateJSON.passages[pageNumber].book +
+      " " +
+      templateJSON.passages[pageNumber].chapter +
+      ": " +
+      templateJSON.passages[pageNumber].verses;
+
+    fileExists(
+      FileSystem.documentDirectory! +
         template +
-        "/audioVisual/" +
-        templateJSON.passages[pageNumber].image
-    );
+        "/" +
+        stripWordsofSpecialCharacters(currentTitle, ":") +
+        "/scriptureImage.jpg"
+    ).then((ret) => {
+      if (ret) {
+        setImageURI(
+          FileSystem.documentDirectory! +
+            template +
+            "/" +
+            stripWordsofSpecialCharacters(currentTitle, ":") +
+            "/scriptureImage.jpg"
+        );
+      } else {
+        setImageURI(
+          FileSystem.documentDirectory +
+            template +
+            "/audioVisual/" +
+            templateJSON.passages[pageNumber].image
+        );
+      }
+    });
 
     setPassageText(templateJSON.passages[pageNumber].text);
     setNotes(templateJSON.passages[pageNumber].notes);
@@ -152,12 +181,27 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
 
   useEffect(() => {
     //reload current template
-    if (!template) {return}
+    if (!template) {
+      return;
+    }
     loadTemplate(template);
   }, [language]);
 
   function setStep(step: string) {
     setTranslationStep(step);
+  }
+
+  function changeImage(uri: string) {
+    setImageURI(uri);
+  }
+
+  function revertImage() {
+    setImageURI(
+      FileSystem.documentDirectory +
+        template +
+        "/audioVisual/" +
+        templateJSON.passages[pageNumber].image
+    );
   }
 
   function languageSwitcher(lng: string) {
@@ -189,11 +233,15 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
 
     try {
       const fileUri =
-        FileSystem.documentDirectory + "/" + template + "/" + language + "_text.json";
+        FileSystem.documentDirectory +
+        "/" +
+        template +
+        "/" +
+        language +
+        "_text.json";
       const jsonData = await FileSystem.readAsStringAsync(fileUri);
       const retJSON = JSON.parse(jsonData);
 
-      
       setTemplateJSON(retJSON);
 
       setAudioURI(
@@ -203,12 +251,37 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
           retJSON.passages[pageNumber].audio
       );
 
-      setImageURI(
-        FileSystem.documentDirectory +
+      var currentTitle =
+        retJSON.passages[pageNumber].book +
+        " " +
+        retJSON.passages[pageNumber].chapter +
+        ": " +
+        retJSON.passages[pageNumber].verses;
+
+      fileExists(
+        FileSystem.documentDirectory! +
           template +
-          "/audioVisual/" +
-          retJSON.passages[pageNumber].image
-      );
+          "/" +
+          stripWordsofSpecialCharacters(currentTitle, ":") +
+          "/scriptureImage.jpg"
+      ).then((ret) => {
+        if (ret) {
+          setImageURI(
+            FileSystem.documentDirectory! +
+              template +
+              "/" +
+              stripWordsofSpecialCharacters(currentTitle, ":") +
+              "/scriptureImage.jpg"
+          );
+        } else {
+          setImageURI(
+            FileSystem.documentDirectory +
+              template +
+              "/audioVisual/" +
+              retJSON.passages[pageNumber].image
+          );
+        }
+      });
 
       setPassageText(retJSON.passages[pageNumber].text);
       setNotes(retJSON.passages[pageNumber].notes);
@@ -269,6 +342,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         playRecording,
         translationStep,
         language,
+        changeImage,
+        revertImage,
         languageSwitcher,
         increment,
         decrement,

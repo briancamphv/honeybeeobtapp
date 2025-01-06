@@ -5,9 +5,6 @@ import * as FileSystem from "expo-file-system";
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 
 import {
-  Appbar,
-  List,
-  IconButton,
   Dialog,
   Portal,
   Button,

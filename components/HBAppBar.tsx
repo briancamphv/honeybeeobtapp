@@ -9,7 +9,6 @@ import {
   Button,
   Text,
   Icon,
-  FAB,
 } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "expo-router";
