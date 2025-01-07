@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
 import { useAssets } from "expo-asset";
-import { useTranslation } from "react-i18next";
 import { fileExists } from "@/helpers/FileUtilies";
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 
@@ -28,7 +27,7 @@ interface AppContextType {
   setStep: (step: string) => void;
   languageSwitcher: (lng: string) => void;
   changeImage: (uri: string) => void;
-  revertImage: () => void,
+  revertImage: () => void;
   language: string;
   translationStep: string;
   template: string;
@@ -40,7 +39,8 @@ interface AppContextType {
   notes: any;
   title: string;
   templatePassages: any[];
-  wordData: Map<string, WordNote>;
+  en_wordData: Map<string, WordNote>;
+  fr_wordData: Map<string, WordNote>;
 }
 
 // Create the context
@@ -80,22 +80,29 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   const [templateJSON, setTemplateJSON] = useState<any>({});
   const [templatePassages, setTemplatePassages] = useState<any>([]);
 
-  const [wordData, setWordData] = useState<Map<string, WordNote>>(new Map());
+  const [en_wordData, setEN_WordData] = useState<Map<string, WordNote>>(
+    new Map()
+  );
+  const [fr_wordData, setFR_WordData] = useState<Map<string, WordNote>>(
+    new Map()
+  );
 
-  const [assets, error] = useAssets(require("../assets/data/wordlinks.csv"));
+  const [assets, error] = useAssets([
+    require("../assets/data/en_wordlinks.tsv"),
+    require("../assets/data/fr_wordlinks.tsv"),
+  ]);
 
   useEffect(() => {
     if (assets === undefined) {
       return;
     }
 
-    const fetchData = async () => {
+    const fetchData = async (uri: string, name: string) => {
       try {
-        const fileContent = await FileSystem.readAsStringAsync(
-          assets![0].localUri!
-        );
+        const fileContent = await FileSystem.readAsStringAsync(uri);
         const lines = fileContent.split("\r\n");
 
+        var wordLang = name.substring(0, 2);
         // skip header line
         const dataLines = lines.slice(1);
         const wordMap = new Map();
@@ -112,13 +119,28 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
           wordMap.set(fields[1], JSON);
         });
 
-        setWordData(wordMap);
+        switch (wordLang) {
+          case "en":
+            setEN_WordData(wordMap);
+
+            break;
+          case "fr":
+            setFR_WordData(wordMap);
+
+            break;
+          default:
+          // code block
+        }
       } catch (error) {
         console.error("Error reading CSV file:", error);
       }
     };
 
-    fetchData();
+    assets!.map((asset) => {
+      // console.log("assets",asset!.localUri!,asset!.name!)
+
+      fetchData(asset!.localUri!, asset!.name!);
+    });
   }, [assets]);
 
   useEffect(() => {
@@ -338,7 +360,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         templatePassages,
         audioStop,
         template,
-        wordData,
+        en_wordData,
+        fr_wordData,
         playRecording,
         translationStep,
         language,

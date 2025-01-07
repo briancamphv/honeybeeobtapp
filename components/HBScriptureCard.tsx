@@ -75,7 +75,15 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       av: "",
     });
 
-  const { language, changeImage, revertImage } = useAppContext();
+  const {
+    language,
+    changeImage,
+    revertImage,
+    template,
+    disableAudio,
+    en_wordData,
+    fr_wordData,
+  } = useAppContext();
 
   const [wordDialogNote, setWordDialogNote] = useState<WordNote>();
   const [wordDialogTitle, setWordDialogTitle] = useState<String>("");
@@ -85,6 +93,19 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
     setExegeticalDialogNote(highlightedPhrases[ndx]);
   };
+  var wordData: any = null;
+
+  switch (language) {
+    case "en":
+      wordData = en_wordData;
+      break;
+    case "fr":
+      wordData = fr_wordData;
+
+      break;
+    default:
+    // code block
+  }
 
   const openWordDialog = (ndx: number) => {
     setWordDialogVisible(true);
@@ -97,8 +118,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
     setWordDialogNote(dialogNotes);
   };
-
-  const { template, disableAudio, wordData } = useAppContext();
 
   const closeExegeticalDialog = () => {
     setExegeticalDialogVisible(false);
@@ -190,8 +209,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     var destFile = recordDir + "scriptureImage.jpg";
 
     createDirectory(recordDir).then(() => {
-    
-
       copyAndWriteFile(image!, destFile, () => null).then(() => {
         changeImage(image);
       });
@@ -203,8 +220,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       setScriptureImageExist(ret)
     );
   }, [imageURI]);
-  
-
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -264,8 +279,8 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       <Card style={styles.card}>
         <View>
           {/* t= set to clear cache */}
-          <Card.Cover  source={{ uri: imageURI + "?t=" + Date.now()}} />
-          
+          <Card.Cover source={{ uri: imageURI + "?t=" + Date.now() }} />
+
           <View
             style={{
               position: "absolute",

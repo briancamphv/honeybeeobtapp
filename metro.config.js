@@ -3,6 +3,7 @@ const { getDefaultConfig } = require('expo/metro-config');
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
-config.resolver.assetExts.push('csv');
+config.resolver.assetExts.push('html');
+config.resolver.assetExts.push('tsv');
 
 module.exports = config;
