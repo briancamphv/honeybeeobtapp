@@ -281,6 +281,82 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   };
   const textElements: React.JSX.Element[] = [];
 
+  const superScriptNumbers = (
+    word: string,
+    index: number,
+    modifiedElements: React.JSX.Element[] = []
+  ) => {
+    var output: string[] = [];
+    var verseNumbers: string[] = [];
+
+    var regex = /\d+/g;
+
+    var match;
+
+    match = word.match(regex);
+ 
+
+    match?.map((verseNumber) => {
+      verseNumbers.push(verseNumber);
+      output.push(word.split(verseNumber)[0]);
+      word = word.split(verseNumber)[1];
+    });
+
+    output.push(word);
+
+    var verseNdx: number = 0;
+
+    output.map((text, outputNdx) => {
+      if (text === "") {
+        modifiedElements.push(
+          <View key={index+Math.random()} style={{ flex: 1, justifyContent: "flex-start" }}>
+            <Text
+              style={[
+                styles.superscript,
+                { fontStyle: isItalic ? "italic" : "normal" },
+              ]}
+              
+            >
+              {verseNumbers[verseNdx]}
+            </Text>
+          </View>
+        );
+        verseNdx++;
+      } else {
+        modifiedElements.push(
+          <Text
+            style={[
+              styles.passageText,
+              { fontStyle: isItalic ? "italic" : "normal" },
+            ]}
+            key={index + +Math.random()}
+          >
+            {text}
+          </Text>
+        );
+
+        if (verseNdx <= verseNumbers.length - 1) {
+          modifiedElements.push(
+            <View key={index + +Math.random()} style={{ flex: 1, justifyContent: "flex-start" }}>
+              <Text
+                style={[
+                  styles.superscript,
+                  { fontStyle: isItalic ? "italic" : "normal" },
+                ]}
+                
+              >
+                {verseNumbers[verseNdx]}
+              </Text>
+            </View>
+          );
+          verseNdx++;
+        }
+      }
+    });
+
+
+  };
+
   const buildScripturePassage = () => {
     splitText.map((word, index) => {
       if (word.includes("~pndx~")) {
@@ -343,15 +419,20 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
         var beginIndex = 0;
 
-        sortedItalicsIndexes.map((italicIndex: italics) => {
-          textElements.push(
-            <Text
-              style={{ fontStyle: isItalic ? "italic" : "normal" }}
-              key={index}
-            >
-             
-              {word.substring(beginIndex, italicIndex.index)}
-            </Text>
+        sortedItalicsIndexes.map((italicIndex: italics, sortedNdx) => {
+          // textElements.push(
+          //   <Text
+          //     style={{ fontStyle: isItalic ? "italic" : "normal" }}
+          //     key={index * (sortedNdx + 2)}
+          //   >
+          //     {word.substring(beginIndex, italicIndex.index)}
+          //   </Text>
+
+          // );
+          superScriptNumbers(
+            word.substring(beginIndex, italicIndex.index),
+            index * (sortedNdx + 2),
+            textElements
           );
 
           isItalic = italicIndex.indexType === "start" ? true : false;
@@ -363,28 +444,30 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
         });
 
         if (sortedItalicsIndexes.length === 0) {
-          textElements.push(
-            <Text
-              style={{ fontStyle: isItalic ? "italic" : "normal" }}
-              key={index + 1000}
-            >
-             
-              {word}
-            </Text>
-          );
+          // textElements.push(
+          //   <Text
+          //     style={{ fontStyle: isItalic ? "italic" : "normal" }}
+          //     key={index + 10000}
+          //   >
+          //     {word}
+          //   </Text>
+          // );
+          superScriptNumbers(word, index + 10000, textElements);
         } else {
-          textElements.push(
-            <Text
-              style={{ fontStyle: isItalic ? "italic" : "normal" }}
-              key={index + 2000}
-            >
-          
-              {word.substring(beginIndex)}
-            </Text>
+          // textElements.push(
+          //   <Text
+          //     style={{ fontStyle: isItalic ? "italic" : "normal" }}
+          //     key={index + 20000}
+          //   >
+          //     {word.substring(beginIndex)}
+          //   </Text>
+          // );
+          superScriptNumbers(
+            word.substring(beginIndex),
+            index + 20000,
+            textElements
           );
         }
-
-  
       }
     });
   };
@@ -668,6 +751,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
 
+  passageText: {},
+
   words: {
     color: "blue",
   },
@@ -686,6 +771,12 @@ const styles = StyleSheet.create({
 
   dialogTitle: {
     fontSize: 16,
+  },
+
+  superscript: {
+    fontSize: 10,
+    fontWeight: "bold",
+    top: -2,
   },
 });
 
