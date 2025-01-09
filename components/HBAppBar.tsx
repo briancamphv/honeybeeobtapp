@@ -10,18 +10,14 @@ import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 import { useAppContext } from "@/context/AppContext";
 import { Help } from "@/helpers/Enumerators";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const HBAppBar: React.FC = () => {
-
-
-
-
-
-
   const navigation = useNavigation();
 
-  const [helpDialogVisible, setHelpDialogVisible] = React.useState<boolean>(false);
-  var helpAsset = ""
+  const [helpDialogVisible, setHelpDialogVisible] =
+    React.useState<boolean>(false);
+  var helpAsset = "";
 
   const onNavigate = (dest: string) => {
     navigation.dispatch(DrawerActions.jumpTo(dest));
@@ -32,8 +28,6 @@ const HBAppBar: React.FC = () => {
 
   const { language } = useAppContext();
   const { t } = useTranslation();
-
-
 
   const WorkFlowMenu = () => {
     const [expanded, setExpanded] = React.useState<boolean>(false);
@@ -107,29 +101,25 @@ const HBAppBar: React.FC = () => {
       </View>
 
       <Portal>
-        <Dialog
-          style={{ flex: 1 }}
+        {helpDialogVisible ? (
+          <HTMLViewer helpFile={"translate"} closeDialog={closeHelpDialog} />
+        ) : (
+          ""
+        )}
+        {/* <Dialog
           visible={helpDialogVisible}
           onDismiss={closeHelpDialog}
+          style={{ flex: 1 }}
         >
-          <HTMLViewer
-            helpFile={"translate"}
-            closeDialog={closeHelpDialog}
-          />
-          {/* <ScrollView
-            bounces={false}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 50 }}
-          >
-            <Dialog.Title>{t("Help", { lng: language })}</Dialog.Title>
-           
-            <Dialog.Actions>
-              <Button onPress={closeHelpDialog}>
-                {t("Close", { lng: language })}
-              </Button>
-            </Dialog.Actions>
-          </ScrollView> */}
-        </Dialog>
+          <Dialog.Title>{t("Help", { lng: language })}</Dialog.Title>
+      
+
+          <Dialog.Actions>
+            <Button onPress={closeHelpDialog}>
+              {t("Close", { lng: language })}
+            </Button>
+          </Dialog.Actions>
+        </Dialog> */}
       </Portal>
     </>
   );

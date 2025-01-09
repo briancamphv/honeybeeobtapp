@@ -45,6 +45,11 @@ interface HBScriptureNote {
   av: string;
 }
 
+interface italics {
+  index: number;
+  indexType: string;
+}
+
 interface WordNote {
   altFormSym: string;
   otherLangEx: string;
@@ -63,6 +68,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   const [scriptureImageExist, setScriptureImageExist] = useState(false);
   const [highlightedPhrases, setHighlightedPhrases] = useState<any[]>([]);
   const [highlightedPassage, setHighlightedPassage] = useState<String>("");
+  var isItalic: boolean = false;
   const [opacity, setOpacity] = useState(1);
   const [exegeticalDialogVisible, setExegeticalDialogVisible] = useState(false);
   const [wordDialogVisible, setWordDialogVisible] = useState(false);
@@ -273,6 +279,117 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       { cancelable: false } // Prevents dismissing the alert by tapping outside
     );
   };
+  const textElements: React.JSX.Element[] = [];
+
+  const buildScripturePassage = () => {
+    splitText.map((word, index) => {
+      if (word.includes("~pndx~")) {
+        var ndx = parseInt(word.substring(6));
+
+        textElements.push(
+          <Text
+            variant="bodyMedium"
+            style={[
+              styles.phrases,
+              { opacity: opacity, fontStyle: isItalic ? "italic" : "normal" },
+            ]}
+            onPress={() => openExegeticalDialog(ndx)}
+            onPressIn={() => setOpacity(0.5)}
+            onPressOut={() => setOpacity(1)}
+            key={index}
+          >
+            {highlightedPhrases[ndx].words}
+          </Text>
+        );
+      } else if (word.includes("~wndx~")) {
+        var ndx = parseInt(word.substring(6));
+
+        textElements.push(
+          <Text
+            variant="bodyMedium"
+            style={[
+              styles.words,
+              { opacity: opacity, fontStyle: isItalic ? "italic" : "normal" },
+            ]}
+            onPress={() => openWordDialog(ndx)}
+            onPressIn={() => setOpacity(0.5)}
+            onPressOut={() => setOpacity(1)}
+            key={index}
+          >
+            {highlightedWords[ndx]}
+          </Text>
+        );
+      } else {
+        var italicsIndexes: italics[] = [];
+        var startItalicIndex: number = 0;
+        var endItalicIndex: number = 0;
+
+        startItalicIndex = word.indexOf("<i>");
+
+        while (startItalicIndex !== -1) {
+          italicsIndexes.push({ index: startItalicIndex, indexType: "start" });
+          startItalicIndex = word.indexOf("<i>", startItalicIndex + 1);
+        }
+
+        endItalicIndex = word.indexOf("</i>");
+        while (endItalicIndex !== -1) {
+          italicsIndexes.push({ index: endItalicIndex, indexType: "end" });
+          endItalicIndex = word.indexOf("</i>", endItalicIndex + 1);
+        }
+
+        const sortedItalicsIndexes = italicsIndexes.sort(
+          (a, b) => a.index - b.index
+        );
+
+        var beginIndex = 0;
+
+        sortedItalicsIndexes.map((italicIndex: italics) => {
+          textElements.push(
+            <Text
+              style={{ fontStyle: isItalic ? "italic" : "normal" }}
+              key={index}
+            >
+             
+              {word.substring(beginIndex, italicIndex.index)}
+            </Text>
+          );
+
+          isItalic = italicIndex.indexType === "start" ? true : false;
+
+          beginIndex =
+            italicIndex.indexType === "end"
+              ? italicIndex.index + 4
+              : italicIndex.index + 3;
+        });
+
+        if (sortedItalicsIndexes.length === 0) {
+          textElements.push(
+            <Text
+              style={{ fontStyle: isItalic ? "italic" : "normal" }}
+              key={index + 1000}
+            >
+             
+              {word}
+            </Text>
+          );
+        } else {
+          textElements.push(
+            <Text
+              style={{ fontStyle: isItalic ? "italic" : "normal" }}
+              key={index + 2000}
+            >
+          
+              {word.substring(beginIndex)}
+            </Text>
+          );
+        }
+
+  
+      }
+    });
+  };
+
+  buildScripturePassage();
 
   return (
     <>
@@ -327,38 +444,8 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           <Text variant="titleLarge">{title}</Text>
           <View style={styles.passage}>
             <Text style={{ opacity }}>
-              {splitText.map((word, index) => {
-                if (word.includes("~pndx~")) {
-                  var ndx = parseInt(word.substring(6));
-                  return (
-                    <Text
-                      variant="bodyMedium"
-                      style={[styles.phrases, { opacity: opacity }]}
-                      onPress={() => openExegeticalDialog(ndx)}
-                      onPressIn={() => setOpacity(0.5)}
-                      onPressOut={() => setOpacity(1)}
-                      key={index}
-                    >
-                      {highlightedPhrases[ndx].words}
-                    </Text>
-                  );
-                } else if (word.includes("~wndx~")) {
-                  var ndx = parseInt(word.substring(6));
-                  return (
-                    <Text
-                      variant="bodyMedium"
-                      style={[styles.words, { opacity: opacity }]}
-                      onPress={() => openWordDialog(ndx)}
-                      onPressIn={() => setOpacity(0.5)}
-                      onPressOut={() => setOpacity(1)}
-                      key={index}
-                    >
-                      {highlightedWords[ndx]}
-                    </Text>
-                  );
-                } else {
-                  return <Text key={index}> {word} </Text>;
-                }
+              {textElements.map((element) => {
+                return element;
               })}
             </Text>
           </View>
@@ -587,6 +674,10 @@ const styles = StyleSheet.create({
 
   phrases: {
     color: "red",
+  },
+
+  italic: {
+    fontStyle: "italic",
   },
 
   dialogContent: {

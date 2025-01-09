@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet } from "react-native";
-import { Button, Switch } from "react-native-paper";
+import { StyleSheet, View, SafeAreaView } from "react-native";
+import { Button } from "react-native-paper";
 import { useWindowDimensions } from "react-native";
 import { WebView } from "react-native-webview";
 import { useAssets } from "expo-asset";
@@ -14,8 +14,6 @@ interface HTMLViewer {
   closeDialog: () => void;
 }
 
-
-
 const HTMLViewer: React.FC<HTMLViewer> = ({ helpFile, closeDialog }) => {
   const { width } = useWindowDimensions();
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
@@ -25,8 +23,7 @@ const HTMLViewer: React.FC<HTMLViewer> = ({ helpFile, closeDialog }) => {
   const { t } = useTranslation();
   const { language } = useAppContext();
 
-  if (helpFile = "translate") {
-
+  if ((helpFile === "translate")) {
     switch (language) {
       case "en":
         name = Help.en_translate;
@@ -38,19 +35,12 @@ const HTMLViewer: React.FC<HTMLViewer> = ({ helpFile, closeDialog }) => {
         name = Help.default;
       // code block
     }
-
   }
-
-  
 
   const [assets, error] = useAssets([
     require("../assets/data/en_TranslateNRevise.html"),
     require("../assets/data/fr_TranslateNRevise.html"),
   ]);
-
-
-
-
 
   useEffect(() => {
     if (assets === undefined) {
@@ -61,8 +51,8 @@ const HTMLViewer: React.FC<HTMLViewer> = ({ helpFile, closeDialog }) => {
 
     const fetchHtml = async () => {
       try {
-        var helpAsset: any = assets!.filter((item) => (item.name === name));
-       
+        var helpAsset: any = assets!.filter((item) => item.name === name);
+
         const response = await fetch(helpAsset[0].localUri);
         const html = await response.text();
 
@@ -76,19 +66,21 @@ const HTMLViewer: React.FC<HTMLViewer> = ({ helpFile, closeDialog }) => {
   }, [assets]);
 
   return (
-    <>
+    
+    <SafeAreaView style={{ flex: .82 }}>
       {htmlContent! ? (
         <WebView
           style={{ width: width + 300 }}
           originWhitelist={["*"]}
           source={{ html: htmlContent }}
+          onMessage={(item) => {console.log("item",item)}}
         />
       ) : (
         ""
       )}
 
-      <Button onPress={closeDialog}>{t("Close", { lng: language })}</Button>
-    </>
+      <Button onPress={() => closeDialog()}>{t("Close", { lng: language })}</Button>
+      </SafeAreaView>
   );
 };
 
