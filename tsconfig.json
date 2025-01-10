@@ -16,5 +16,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "components/HBWorkFlowTitleBar.js", "components/HBWorkFlowCard.js", "components/HBWorkFlowCard.js", "components/HBWorkFlowTitleBar.js", "components/HBAudioPlayer.tsx", "app/screens/login.js", "app/(tabs)/_layout.js", "components/DownloadFileWeb.js", "context/1.js"  ]
+, "components/HBWorkFlowTitleBar.js", "components/HBWorkFlowCard.js", "components/HBWorkFlowCard.js", "components/HBWorkFlowTitleBar.js", "components/HBAudioPlayer.tsx", "app/screens/login.js", "app/(tabs)/_layout.js", "components/DownloadFileWeb.js", "context/1.js", "app/(tabs)/swipeevents.js"  ]
 }

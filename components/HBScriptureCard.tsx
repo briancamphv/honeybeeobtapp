@@ -294,7 +294,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     var match;
 
     match = word.match(regex);
- 
 
     match?.map((verseNumber) => {
       verseNumbers.push(verseNumber);
@@ -309,13 +308,15 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     output.map((text, outputNdx) => {
       if (text === "") {
         modifiedElements.push(
-          <View key={index+Math.random()} style={{ flex: 1, justifyContent: "flex-start" }}>
+          <View
+            key={index + Math.random()}
+            style={{ flex: 1, justifyContent: "flex-start" }}
+          >
             <Text
               style={[
                 styles.superscript,
                 { fontStyle: isItalic ? "italic" : "normal" },
               ]}
-              
             >
               {verseNumbers[verseNdx]}
             </Text>
@@ -329,7 +330,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
               styles.passageText,
               { fontStyle: isItalic ? "italic" : "normal" },
             ]}
-            key={index + +Math.random()}
+            key={index + Math.random()}
           >
             {text}
           </Text>
@@ -337,13 +338,15 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
         if (verseNdx <= verseNumbers.length - 1) {
           modifiedElements.push(
-            <View key={index + +Math.random()} style={{ flex: 1, justifyContent: "flex-start" }}>
+            <View
+              key={index + Math.random()}
+              style={{ flex: 1, justifyContent: "flex-start" }}
+            >
               <Text
                 style={[
                   styles.superscript,
                   { fontStyle: isItalic ? "italic" : "normal" },
                 ]}
-                
               >
                 {verseNumbers[verseNdx]}
               </Text>
@@ -353,8 +356,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
         }
       }
     });
-
-
   };
 
   const buildScripturePassage = () => {
@@ -473,14 +474,27 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   };
 
   buildScripturePassage();
+  const [imageHeight, setImageHeight] = useState<number>(0);
+
+  Image.getSize(imageURI, (imgWidth, imgHeight) => {
+    const aspectRatio = imgHeight / imgWidth;
+    const calculatedHeight = screenWidth * aspectRatio;
+    setImageHeight(calculatedHeight);
+  });
 
   return (
     <>
       <Card style={styles.card}>
         <View>
           {/* t= set to clear cache */}
-          <Card.Cover source={{ uri: imageURI + "?t=" + Date.now() }} />
+          <Card.Cover
+            // source={{ uri: imageURI + "?t=" + Date.now() }}
+            source={{ uri: imageURI }}
+            style={{ height: imageHeight }}
+          />
 
+          {/*  uncomment the following code to enable image selection/replacement
+          
           <View
             style={{
               position: "absolute",
@@ -518,20 +532,30 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
             </View>
           ) : (
             ""
-          )}
+          )} */}
         </View>
 
         <AudioPlayer audioUri={audioURI} />
 
         <Card.Content>
+        <View>
           <Text variant="titleLarge">{title}</Text>
+
           <View style={styles.passage}>
-            <Text style={{ opacity }}>
-              {textElements.map((element) => {
-                return element;
-              })}
-            </Text>
+            <ScrollView
+              bounces={false}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 50 }}
+            >
+              <Text style={{ opacity }}>
+                {textElements.map((element) => {
+                  return element;
+                })}
+            
+              </Text>
+            </ScrollView>
           </View>
+        </View>
         </Card.Content>
       </Card>
 

@@ -3,6 +3,7 @@ import * as FileSystem from "expo-file-system";
 import { useAssets } from "expo-asset";
 import { fileExists } from "@/helpers/FileUtilies";
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
+import { scripture } from "@/interfaces/appInterfaces";
 
 // Define the type for the context values
 
@@ -20,6 +21,7 @@ interface AppContextType {
   loadTemplate: (template: string) => Promise<any>;
   incrementPageNumber: () => void;
   decrementPageNumber: () => void;
+  changePageNumber: (pgNbr: number) => void;
   enableAudio: () => void;
   disableAudio: () => void;
   isPlayRecording: () => void;
@@ -28,6 +30,8 @@ interface AppContextType {
   languageSwitcher: (lng: string) => void;
   changeImage: (uri: string) => void;
   revertImage: () => void;
+  getPage: (pageNumber: number) => Promise<scripture>;
+  getNumberOfPages: () => number;
   language: string;
   translationStep: string;
   template: string;
@@ -137,8 +141,6 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     };
 
     assets!.map((asset) => {
-      // console.log("assets",asset!.localUri!,asset!.name!)
-
       fetchData(asset!.localUri!, asset!.name!);
     });
   }, [assets]);
@@ -239,6 +241,15 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     }
   }
 
+  function changePageNumber(pgNbr: number) {
+    disableAudio();
+    if (pgNbr === templatePassages.length - 1) {
+      setPageNumber(0);
+    } else {
+      setPageNumber(pgNbr);
+    }
+  }
+
   function decrementPageNumber() {
     disableAudio();
     if (pageNumber === 0) {
@@ -246,6 +257,66 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     } else {
       setPageNumber(pageNumber - 1);
     }
+  }
+
+  function getNumberOfPages(): number {
+    return templateJSON.passages.length;
+  }
+
+  async function getPage(pageNumber: number): Promise<scripture> {
+    var audioURI =
+      FileSystem.documentDirectory +
+      template +
+      "/audioVisual/" +
+      templateJSON.passages[pageNumber].audio;
+
+    var currentTitle =
+      templateJSON.passages[pageNumber].book +
+      " " +
+      templateJSON.passages[pageNumber].chapter +
+      ": " +
+      templateJSON.passages[pageNumber].verses;
+
+    var imageURI = "";
+    var imgFileExist = await fileExists(
+      FileSystem.documentDirectory! +
+        template +
+        "/" +
+        stripWordsofSpecialCharacters(currentTitle, ":") +
+        "/scriptureImage.jpg"
+    );
+
+    if (imgFileExist) {
+      imageURI =
+        FileSystem.documentDirectory! +
+        template +
+        "/" +
+        stripWordsofSpecialCharacters(currentTitle, ":") +
+        "/scriptureImage.jpg";
+    } else {
+      imageURI =
+        FileSystem.documentDirectory +
+        template +
+        "/audioVisual/" +
+        templateJSON.passages[pageNumber].image;
+    }
+
+    var passageText = templateJSON.passages[pageNumber].text;
+    var notes = templateJSON.passages[pageNumber].notes;
+    var title =
+      templateJSON.passages[pageNumber].book +
+      " " +
+      templateJSON.passages[pageNumber].chapter +
+      ": " +
+      templateJSON.passages[pageNumber].verses;
+
+    return {
+      imageURI: imageURI,
+      audioURI: audioURI,
+      passageText: passageText,
+      title: title,
+      notes: notes,
+    };
   }
 
   async function loadTemplate(template: string): Promise<any> {
@@ -365,8 +436,11 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         playRecording,
         translationStep,
         language,
+        changePageNumber,
         changeImage,
         revertImage,
+        getPage,
+        getNumberOfPages,
         languageSwitcher,
         increment,
         decrement,

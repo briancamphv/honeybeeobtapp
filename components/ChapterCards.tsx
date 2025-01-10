@@ -73,7 +73,7 @@ const ChapterCards: React.FC<ChapterCards> = ({
 
     setStep("translate");
     loadTemplate(item).then(() => {
-      navigation.dispatch(DrawerActions.jumpTo("TranslateAndRevise"));
+      navigation.dispatch(DrawerActions.jumpTo("ScripturePager"));
       setAreChaptersVisible(false);
       setAreBooksVisible(true);
     });

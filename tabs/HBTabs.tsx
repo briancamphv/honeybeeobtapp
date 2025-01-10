@@ -67,8 +67,9 @@ const TemplateTab: React.FC = () => {
       />
       {passageText !== "" ? (
         <Tabs.Screen
-          name="TranslateAndRevise"
+          name="ScripturePager"
           options={{
+          
             title: t("Translate", { lng: language }),
             tabBarIcon: ({ color }) => (
               <Ionicons name="language" size={28} color={color} />
@@ -77,7 +78,7 @@ const TemplateTab: React.FC = () => {
         />
       ) : (
         <Tabs.Screen
-          name="TranslateAndRevise"
+          name="ScripturePager"
           options={{
             href: null,
             title: t("Translate", { lng: language }),
@@ -91,6 +92,7 @@ const TemplateTab: React.FC = () => {
       <Tabs.Screen
         name="Settings"
         options={{
+          animation: "fade",
           title: t("Settings", { lng: language }),
           tabBarIcon: ({ color }) => (
             <Ionicons name="settings" size={28} color={color} />

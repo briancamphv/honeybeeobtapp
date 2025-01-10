@@ -19,33 +19,47 @@ import {
   Gesture,
 } from "react-native-gesture-handler";
 
+import { scripture } from "../interfaces/appInterfaces";
+
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
 
-const TranslateAndRevise: React.FC = () => {
+
+
+const TranslateAndRevise: React.FC<scripture> = ({
+  imageURI,
+  audioURI,
+  passageText,
+  title,
+  notes,
+}) => {
   const {
     incrementPageNumber,
     decrementPageNumber,
-    imageURI,
-    audioURI,
-    passageText,
-    title,
-    notes,
+    changePageNumber,
     setStep,
   } = useAppContext();
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
+  //  useEffect(() => {
+  //   if (pageNumber === null) return
+
+  //   changePageNumber(pageNumber)
+  //  },[pageNumber])
+
+  //changePageNumber(pageNumber)
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [
-        { translateX: translateX.value },
-        { translateY: translateY.value },
-      ],
+      // transform: [
+      //   { translateX: translateX.value },
+      //   { translateY: translateY.value },
+      // ],
     };
   });
 
@@ -64,48 +78,66 @@ const TranslateAndRevise: React.FC = () => {
   // ).then((val) => console.log(val));
 
   const onSwipe = (event: any) => {
-    if (event.translationX < 0) {
+    // if (event.translationY > 0) {
+    //   console.log('Moving down');
+    // } else if (event.translationY < 0) {
+    //   console.log('Moving up');
+    // }
+
+    if (event.translationX < -100) {
       // Swipe right
 
       incrementPageNumber();
       translateX.value = 0;
       translateY.value = 0;
-    } else {
+    } else if (event.translationX > 100) {
       // Swipe left
       decrementPageNumber();
+      translateX.value = 0;
+      translateY.value = 0;
+    } else {
       translateX.value = 0;
       translateY.value = 0;
     }
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <GestureDetector
-        gesture={Gesture.Pan()
-          .onChange(onGestureEvent)
-          .onEnd(onSwipe)
-          .runOnJS(true)}
+    // <GestureHandlerRootView style={{ flex: 1 }}>
+    //   <GestureDetector
+    //     gesture={Gesture.Pan()
+    //       .onChange(onGestureEvent)
+    //       .onEnd(onSwipe)
+    //       .runOnJS(true)}
+    //   >
+
+    //  <Animated.View
+    // style={[
+    //   { flex: 1, justifyContent: "center", alignItems: "center" },
+    //   animatedStyle,
+    // ]}
+
+    <SafeAreaView style={styles.container}>
+      <View
+        style={[
+          { flex: 1, justifyContent: "center", alignItems: "center" },
+          animatedStyle,
+        ]}
       >
-        <SafeAreaView style={styles.container}>
-          <Animated.View
-            style={[
-              { flex: 1, justifyContent: "center", alignItems: "center" },
-              animatedStyle,
-            ]}
-          >
-            <HBAppBar />
-            <HBScriptureCard
-              imageURI={imageURI}
-              passageText={passageText}
-              title={title}
-              notes={notes}
-              audioURI={audioURI}
-            />
-            <HBRecordBar />
-          </Animated.View>
-        </SafeAreaView>
-      </GestureDetector>
-    </GestureHandlerRootView>
+        <HBAppBar />
+        <HBScriptureCard
+          imageURI={imageURI}
+          passageText={passageText}
+          title={title}
+          notes={notes}
+          audioURI={audioURI}
+        />
+        <HBRecordBar />
+      </View>
+    </SafeAreaView>
+
+    // </Animated.View>
+    //   </GestureDetector>
+    // </GestureHandlerRootView>
   );
 };
 
