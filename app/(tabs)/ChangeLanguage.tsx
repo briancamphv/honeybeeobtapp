@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 import { Divider, List, MD3Colors } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 
-import { SafeAreaView, View } from "react-native";
+import {  View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Languages, { LanguageInterface } from "../data/Languages";
 

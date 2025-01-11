@@ -1,6 +1,6 @@
 import React from "react";
 
-import { SafeAreaView } from "react-native-safe-area-context";
+
 import { StyleSheet, View } from "react-native";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
@@ -9,6 +9,7 @@ import { List, MD3Colors, Divider } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@/context/AppContext";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Settings: React.FC = () => {
   const navigation = useNavigation();

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, PlatformColor } from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { Icon } from "react-native-paper";
@@ -484,16 +484,33 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
   return (
     <>
-      <Card style={styles.card}>
-        <View>
-          {/* t= set to clear cache */}
-          <Card.Cover
-            // source={{ uri: imageURI + "?t=" + Date.now() }}
-            source={{ uri: imageURI }}
-            style={{ height: imageHeight }}
-          />
+      <ScrollView
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 0 }}
+        style={styles.card}
+      >
+      <View style={styles.card}>
+        <Card
+          style={{
+            borderRadius: 0,
+            elevation: 0,
+            borderWidth: 0,
+            shadowColor: "transparent",
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0,
+            shadowRadius: 0,
+          }}
+        >
+          <View>
+            {/* t= set to clear cache */}
+            <Card.Cover
+              // source={{ uri: imageURI + "?t=" + Date.now() }}
+              source={{ uri: imageURI }}
+              style={{ height: imageHeight }}
+            />
 
-          {/*  uncomment the following code to enable image selection/replacement
+            {/*  uncomment the following code to enable image selection/replacement
           
           <View
             style={{
@@ -533,31 +550,26 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           ) : (
             ""
           )} */}
-        </View>
-
-        <AudioPlayer audioUri={audioURI} />
-
-        <Card.Content>
-        <View>
-          <Text variant="titleLarge">{title}</Text>
-
-          <View style={styles.passage}>
-            <ScrollView
-              bounces={false}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingBottom: 50 }}
-            >
-              <Text style={{ opacity }}>
-                {textElements.map((element) => {
-                  return element;
-                })}
-            
-              </Text>
-            </ScrollView>
           </View>
-        </View>
-        </Card.Content>
-      </Card>
+
+          <AudioPlayer audioUri={audioURI} />
+
+          <Card.Content>
+            <View>
+              <Text variant="titleLarge">{title}</Text>
+
+              <View style={styles.passage}>
+                <Text style={{ opacity }}>
+                  {textElements.map((element) => {
+                    return element;
+                  })}
+                </Text>
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
+      </View>
+      </ScrollView>
 
       <Portal>
         <Dialog
@@ -762,7 +774,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
 const styles = StyleSheet.create({
   card: {
-    flex: Platform.OS === "ios" ? 0.85 : 1,
+   
   },
 
   title: {
@@ -791,6 +803,7 @@ const styles = StyleSheet.create({
 
   dialogContent: {
     fontSize: 12,
+    backgroundColor: "transparent"
   },
 
   dialogTitle: {

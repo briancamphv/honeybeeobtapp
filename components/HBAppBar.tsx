@@ -10,7 +10,7 @@ import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 import { useAppContext } from "@/context/AppContext";
 import { Help } from "@/helpers/Enumerators";
-import { SafeAreaView } from "react-native-safe-area-context";
+
 
 const HBAppBar: React.FC = () => {
   const navigation = useNavigation();

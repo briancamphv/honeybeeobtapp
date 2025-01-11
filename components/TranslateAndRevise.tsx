@@ -1,9 +1,10 @@
 import React from "react";
-import { useEffect, useRef } from "react";
+import { Platform } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppContext } from "@/context/AppContext";
 
-import { View, StyleSheet, SafeAreaView } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "expo-router";
@@ -119,7 +120,7 @@ const TranslateAndRevise: React.FC<scripture> = ({
     <SafeAreaView style={styles.container}>
       <View
         style={[
-          { flex: 1, justifyContent: "center", alignItems: "center" },
+          { flex: Platform.OS === 'ios' ? .93 : 1, justifyContent: "center", alignItems: "center" },
           animatedStyle,
         ]}
       >

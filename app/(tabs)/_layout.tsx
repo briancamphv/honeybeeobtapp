@@ -11,6 +11,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../translate/i18n";
 import { useTranslation } from "react-i18next";
 import { AppProvider } from "@/context/AppContext";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import HBTabs from "@/tabs/HBTabs";
 
@@ -30,15 +31,17 @@ const TabLayout = () => {
   const colorScheme = useColorScheme();
 
   return (
-    <AppProvider>
-      <I18nextProvider i18n={i18n}>
-        <PaperProvider theme={theme}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <HBTabs />
-          </GestureHandlerRootView>
-        </PaperProvider>
-      </I18nextProvider>
-    </AppProvider>
+    <SafeAreaProvider>
+      <AppProvider>
+        <I18nextProvider i18n={i18n}>
+          <PaperProvider theme={theme}>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <HBTabs />
+            </GestureHandlerRootView>
+          </PaperProvider>
+        </I18nextProvider>
+      </AppProvider>
+    </SafeAreaProvider>
   );
 };
 
