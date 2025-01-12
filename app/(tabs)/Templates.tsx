@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Card, Title, Appbar } from "react-native-paper";
+import {  Appbar } from "react-native-paper";
 
 import ChapterCards from "@/components/ChapterCards";
 import BookCards from "@/components/BookCards";

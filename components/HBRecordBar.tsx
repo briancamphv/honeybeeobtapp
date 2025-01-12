@@ -1,16 +1,16 @@
 import * as React from "react";
 
-import { StyleSheet, View, Dimensions, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Dimensions,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import * as FileSystem from "expo-file-system";
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 
-import {
-  Dialog,
-  Portal,
-  Button,
-  Text,
-  Icon,
-} from "react-native-paper";
+import { Dialog, Portal, Button, Text, Icon } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import { useAppContext } from "@/context/AppContext";
@@ -24,9 +24,7 @@ import {
   createDirectory,
 } from "@/helpers/FileUtilies";
 
-import audioRecorderPlayer, {
-  PlayBackType,
-} from "react-native-audio-recorder-player";
+import { PlayBackType } from "react-native-audio-recorder-player";
 
 // interface RecordingState {
 //   recording: Audio.Recording | null;
@@ -35,13 +33,12 @@ import audioRecorderPlayer, {
 
 const { width: screenWidth } = Dimensions.get("screen");
 
-const audioRecorder = new audioRecorderPlayer();
-
 const HBRecordBar: React.FC = () => {
   const {
     disableAudio,
     isPlayRecording,
     isNotPlayRecording,
+    audioRecorder,
     template,
     translationStep,
     title,
@@ -94,10 +91,9 @@ const HBRecordBar: React.FC = () => {
   };
 
   const onStartRecord = async () => {
-    disableAudio();
-
     setIsRecording(true);
     setPlaying(false);
+    disableAudio();
     const result = await audioRecorder.startRecorder();
   };
 
@@ -122,7 +118,6 @@ const HBRecordBar: React.FC = () => {
     setIsRecording(false);
 
     const result = await audioRecorder.stopRecorder();
-
 
     var files = await listFiles(recordDir);
 
@@ -151,8 +146,6 @@ const HBRecordBar: React.FC = () => {
   const onStartPlay = async () => {
     isPlayRecording();
 
-   
-
     const msg = await audioRecorder.startPlayer(audioURI);
     setPlaying(true);
   };
@@ -164,7 +157,7 @@ const HBRecordBar: React.FC = () => {
         isNotPlayRecording();
         await audioRecorder.pausePlayer();
       } else {
-        isNotPlayRecording();
+        isPlayRecording();
         await audioRecorder.resumePlayer();
       }
     } else {
@@ -183,102 +176,13 @@ const HBRecordBar: React.FC = () => {
   };
 
   const closeDraftRecordsDialog = () => {
-
-    disableAudio();
     setDraftRecordsDialogVisible(false);
+    disableAudio();
   };
 
   const onStopPlay = async () => {
     audioRecorder.stopPlayer();
   };
-
-  // const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
-  //   if (status.isLoaded) {
-  //     setDuration(status.durationMillis || 0);
-  //     setPosition(status.positionMillis || 0);
-  //     if (status.positionMillis === status.durationMillis) {
-  //       sound?.setPositionAsync(0);
-  //     }
-  //   }
-  // };
-
-  // const startRecording = async () => {
-  //   try {
-  //     setState({ ...state, recording: null });
-  //     setIsRecording(true);
-  //     console.log("startRecording");
-  //     await Audio.requestPermissionsAsync();
-  //     await Audio.setAudioModeAsync({
-  //       allowsRecordingIOS: true,
-  //       playsInSilentModeIOS: true,
-  //     });
-  //     const { recording } = await Audio.Recording.createAsync(
-  //       Audio.RecordingOptionsPresets.HIGH_QUALITY
-  //     );
-  //     setState({ ...state, recording });
-  //   } catch (err) {
-  //     console.error("Failed to start recording", err);
-  //   }
-  // };
-  // const stopRecording = async () => {
-  //   if (state.recording) {
-  //     await state.recording.stopAndUnloadAsync();
-  //     const uri = state.recording.getURI();
-
-  //     console.log("Recording stopped and stored at", uri);
-  //     loadSound(uri);
-  //     setState({ ...state, recording: null });
-  //     setIsRecording(false);
-  //     setPlaying(false);
-  //   }
-  // };
-
-  // const loadSound = async (audioUri: any) => {
-  //   if (sound) {
-  //     await sound.unloadAsync();
-  //   }
-
-  //   console.log("loadSound", audioUri);
-  //   try {
-  //     const { sound: newSound } = await Audio.Sound.createAsync(
-  //       { uri: audioUri },
-  //       { shouldPlay: false },
-  //       onPlaybackStatusUpdate
-  //     );
-  //     console.log("newSound", newSound);
-  //     setSound(newSound);
-  //   } catch (error) {
-  //     console.error("Failed to load sound", error);
-  //   }
-  // };
-
-  // const playSound = async () => {
-  //   console.log("sound", sound);
-  //   if (!sound) {
-  //     console.log("no sound");
-  //     return;
-  //   }
-
-  //   await sound.playAsync();
-  //   //reset to beginning
-  //   sound.setPositionAsync(0);
-  // };
-
-  // const replay = async () => {
-  //   setPlaying(true);
-  //   sound?.setPositionAsync(0);
-  // };
-
-  // const playPauseSound = async () => {
-  //   if (!sound) return;
-
-  //   if (playing) {
-  //     await sound.pauseAsync();
-  //   } else {
-  //     await sound.playAsync();
-  //   }
-  //   setPlaying(!playing);
-  // };
 
   const openRecordingFolder = () => {
     openDraftRecordsDialog();
@@ -287,57 +191,74 @@ const HBRecordBar: React.FC = () => {
   return (
     <>
       <View style={styles.title}>
-        <TouchableOpacity style={{ paddingRight: 20 }} onPress={isRecording ? onStopRecord : onStartRecord}>
-          <Icon color="white" source={isRecording ? "stop" : "microphone"} size={30} />
+        <TouchableOpacity
+          style={{ paddingRight: 20 }}
+          onPress={isRecording ? onStopRecord : onStartRecord}
+        >
+          <Icon
+            color="white"
+            source={isRecording ? "stop" : "microphone"}
+            size={30}
+          />
         </TouchableOpacity>
         <TouchableOpacity style={{ paddingRight: 20 }} onPress={onPausePlay}>
           <Icon color="white" source={playing ? "pause" : "play"} size={30} />
         </TouchableOpacity>
-        <TouchableOpacity style={{ paddingRight: 20 }} onPress={openRecordingFolder}>
+        <TouchableOpacity
+          style={{ paddingRight: 20 }}
+          onPress={openRecordingFolder}
+        >
           <Icon color="white" source={"folder-edit-outline"} size={30} />
         </TouchableOpacity>
       </View>
-
-     
 
       <Portal>
         <Dialog
           style={{ width: screenWidth - 50 }}
           visible={draftRecordsDialogVisible}
           onDismiss={closeDraftRecordsDialog}
+          dismissable={false}
         >
-          <Dialog.Title style={styles.dialogTitle}>
-            {t("Recordings", { lng: language })}:
-          </Dialog.Title>
+          <Dialog.ScrollArea>
+            <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+              <Dialog.Title style={styles.dialogTitle}>
+                {t("Recordings", { lng: language })}:
+              </Dialog.Title>
 
-          <Dialog.Content>
-            {draftRecordings.sort().map((item, index) => {
-              return (
-                <View
-                  key={index}
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    width: screenWidth - 100,
-                    alignItems: "center",
-                    borderWidth: 1,
-                    borderColor: "#D3D3D3",
-                    padding: 20,
-                  }}
-                >
-                  <TouchableOpacity onPress={() => playDraftRecording(item)}>
-                    <Icon color="black" source="play" size={25} />
-                  </TouchableOpacity>
+              <Dialog.Content>
+                {draftRecordings.sort().map((item, index) => {
+                  return (
+                    <View
+                      key={index}
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        width: screenWidth - 100,
+                        alignItems: "center",
+                        borderWidth: 1,
+                        borderColor: "#D3D3D3",
+                        padding: 20,
+                      }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => playDraftRecording(item)}
+                      >
+                        <Icon color="black" source="play" size={25} />
+                      </TouchableOpacity>
 
-                  <Text style={{ fontSize: 15 }}>{item}</Text>
+                      <Text style={{ fontSize: 15 }}>{item}</Text>
 
-                  <TouchableOpacity onPress={() => deleteDraftRecording(item)}>
-                    <Icon color="red" source="delete" size={25} />
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </Dialog.Content>
+                      <TouchableOpacity
+                        onPress={() => deleteDraftRecording(item)}
+                      >
+                        <Icon color="red" source="delete" size={25} />
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
+              </Dialog.Content>
+            </ScrollView>
+          </Dialog.ScrollArea>
 
           <Dialog.Actions>
             <Button onPress={closeDraftRecordsDialog}>
@@ -358,11 +279,10 @@ const styles = StyleSheet.create({
     margin: 3,
     color: "white",
     flexDirection: "row",
-    width: "100%"
+    width: "100%",
   },
 
   titleContainer: {
-   
     alignItems: "center",
   },
 

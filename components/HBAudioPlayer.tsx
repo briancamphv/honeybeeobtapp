@@ -4,22 +4,21 @@ import Slider from "@react-native-community/slider";
 import { Icon, MD3Colors } from "react-native-paper"; // Adjust this import according to your UI component needs
 import { useAppContext } from "@/context/AppContext";
 
-import AudioRecorderPlayer, {
+import  {
   PlayBackType,
 } from "react-native-audio-recorder-player";
 
-const audioPlayer = new AudioRecorderPlayer();
 
 interface AudioPlayerProps {
   audioUri: string;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
-  const { enableAudio, audioStop, playRecording } = useAppContext();
+  const { audioPlayer, enableAudio, audioStop, playRecording } = useAppContext();
 
   useEffect(() => {
     if (audioStop) {
-      onStopPlay();
+      // onStopPlay();
       setAudioLoaded(false);
       setPlaying(false);
       setCurrentPosition(0);

@@ -4,6 +4,12 @@ import { useAssets } from "expo-asset";
 import { fileExists } from "@/helpers/FileUtilies";
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 import { scripture } from "@/interfaces/appInterfaces";
+import AudioRecorderPlayer, {
+  PlayBackType,
+} from "react-native-audio-recorder-player";
+
+const audioPlayer = new AudioRecorderPlayer();
+const audioRecorder = new AudioRecorderPlayer();
 
 // Define the type for the context values
 
@@ -32,6 +38,8 @@ interface AppContextType {
   revertImage: () => void;
   getPage: (pageNumber: number) => Promise<scripture>;
   getNumberOfPages: () => number;
+  audioPlayer: AudioRecorderPlayer;
+  audioRecorder: AudioRecorderPlayer;
   language: string;
   translationStep: string;
   template: string;
@@ -404,7 +412,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   };
 
   const disableAudio = () => {
-    setAudioStop(true);
+    audioPlayer.stopPlayer().then(() => setAudioStop(true));
   };
 
   const enableAudio = () => {
@@ -436,6 +444,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         playRecording,
         translationStep,
         language,
+        audioPlayer,
+        audioRecorder,
         changePageNumber,
         changeImage,
         revertImage,

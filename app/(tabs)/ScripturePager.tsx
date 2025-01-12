@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import TranslateAndRevise from "../../components/TranslateAndRevise";
 import { useAppContext } from "@/context/AppContext";
@@ -28,6 +28,7 @@ const ScripturePager = () => {
     }
 
     var numPages = getNumberOfPages();
+
     setNumberOfPages(numPages);
 
     var ndx = 0;
@@ -77,6 +78,7 @@ const ScripturePager = () => {
     <PagerView
       ref={pagerViewRef}
       onPageSelected={handlePageSelected}
+
       style={styles.pagerView}
       initialPage={0}
     >
