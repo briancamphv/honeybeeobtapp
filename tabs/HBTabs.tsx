@@ -92,7 +92,6 @@ const TemplateTab: React.FC = () => {
       <Tabs.Screen
         name="Settings"
         options={{
-          animation: "fade",
           title: t("Settings", { lng: language }),
           tabBarIcon: ({ color }) => (
             <Ionicons name="settings" size={28} color={color} />

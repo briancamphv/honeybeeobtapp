@@ -9,7 +9,6 @@ import AudioRecorderPlayer, {
 } from "react-native-audio-recorder-player";
 
 const audioPlayer = new AudioRecorderPlayer();
-const audioRecorder = new AudioRecorderPlayer();
 
 // Define the type for the context values
 
@@ -29,7 +28,7 @@ interface AppContextType {
   decrementPageNumber: () => void;
   changePageNumber: (pgNbr: number) => void;
   enableAudio: () => void;
-  disableAudio: () => void;
+  disableAudio: () => Promise<void>;
   isPlayRecording: () => void;
   isNotPlayRecording: () => void;
   setStep: (step: string) => void;
@@ -39,7 +38,6 @@ interface AppContextType {
   getPage: (pageNumber: number) => Promise<scripture>;
   getNumberOfPages: () => number;
   audioPlayer: AudioRecorderPlayer;
-  audioRecorder: AudioRecorderPlayer;
   language: string;
   translationStep: string;
   template: string;
@@ -411,8 +409,10 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     setCount(count - 1);
   };
 
-  const disableAudio = () => {
-    audioPlayer.stopPlayer().then(() => setAudioStop(true));
+  const disableAudio = async (): Promise<void> => {
+    audioPlayer.removePlayBackListener();
+    setAudioStop(true);
+    await audioPlayer.stopPlayer();
   };
 
   const enableAudio = () => {
@@ -445,7 +445,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         translationStep,
         language,
         audioPlayer,
-        audioRecorder,
+
         changePageNumber,
         changeImage,
         revertImage,

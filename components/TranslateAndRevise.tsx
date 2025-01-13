@@ -1,6 +1,9 @@
 import React from "react";
 import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator } from "react-native-paper";
+import { useState } from "react";
+import { Portal, Modal } from "react-native-paper";
 
 import { View, StyleSheet } from "react-native";
 
@@ -21,6 +24,11 @@ const TranslateAndRevise: React.FC<scripture> = ({
   notes,
 }) => {
   const { t } = useTranslation();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const setLoading = (loading: boolean): void => {
+    setIsLoading(loading);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,9 +48,18 @@ const TranslateAndRevise: React.FC<scripture> = ({
           title={title}
           notes={notes}
           audioURI={audioURI}
+          setLoading={setLoading}
         />
         <HBRecordBar />
       </View>
+
+      <Portal>
+        <Modal style={styles.activityIndicator} visible={isLoading} dismissable={false}>
+          <View>
+            <ActivityIndicator animating={true} size="large" color="black" />
+          </View>
+        </Modal>
+      </Portal>
     </SafeAreaView>
   );
 };
@@ -76,5 +93,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     animationDuration: "0s",
+  },
+  activityIndicator: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
   },
 });

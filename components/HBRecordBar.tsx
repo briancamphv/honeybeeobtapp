@@ -38,7 +38,7 @@ const HBRecordBar: React.FC = () => {
     disableAudio,
     isPlayRecording,
     isNotPlayRecording,
-    audioRecorder,
+    audioPlayer,
     template,
     translationStep,
     title,
@@ -47,15 +47,12 @@ const HBRecordBar: React.FC = () => {
 
   const { t } = useTranslation();
 
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [isPlayingDraft, setIsPlayingDraft] = useState<boolean>(false);
+  const [draftIndex, setDraftIndex] = useState<number>(-1);
 
   const recordingRef = useRef(null);
 
-  //const [currentPosition, setCurrentPosition] = useState(0);
-  const [audioLoaded, setAudioLoaded] = useState<boolean>(false);
-
-  // const [duration, setDuration] = useState<number | null>(null);
-  // const [position, setPosition] = useState<number | undefined>(undefined);
   const [playing, setPlaying] = useState<boolean>(false);
 
   const recordDir =
@@ -72,20 +69,16 @@ const HBRecordBar: React.FC = () => {
 
   const [audioURI, setAudioUri] = useState<string>("");
 
-  //const [sound, setSound] = useState<Audio.Sound | null>(null);
-
-  audioRecorder.addPlayBackListener((status) => onPlaybackStatusUpdate(status));
+  audioPlayer.removePlayBackListener();
+  audioPlayer.addPlayBackListener((status) => onPlaybackStatusUpdate(status));
 
   const onPlaybackStatusUpdate = (status: PlayBackType) => {
-    // setDuration(status.duration || 0);
-    // setCurrentPosition(status.currentPosition || 0);
-
     if (status.isFinished) {
-      setAudioLoaded(false);
       setPlaying(false);
       setHasStarted(false);
       isNotPlayRecording();
-      //audioRecorder.seekToPlayer(0)
+      setIsPlayingDraft(false);
+      //audioPlayer.seekToPlayer(0)
       // setCurrentPosition(0);
     }
   };
@@ -94,14 +87,30 @@ const HBRecordBar: React.FC = () => {
     setIsRecording(true);
     setPlaying(false);
     disableAudio();
-    const result = await audioRecorder.startRecorder();
+    const result = await audioPlayer.startRecorder();
   };
 
-  const playDraftRecording = async (item: string) => {
-    isPlayRecording();
-    var playFile = recordDir + item;
+  const playDraftRecording = async (item: string, index: number) => {
+    setDraftIndex(index);
 
-    audioRecorder.startPlayer(playFile);
+    if (isPlayingDraft) {
+      setIsPlayingDraft(false);
+      isNotPlayRecording();
+      audioPlayer.stopPlayer();
+    } else {
+      isPlayRecording();
+      setIsPlayingDraft(true);
+      var playFile = recordDir + item;
+
+      disableAudio();
+
+      setTimeout(() => {
+        audioPlayer.addPlayBackListener((status) =>
+          onPlaybackStatusUpdate(status)
+        );
+        audioPlayer.startPlayer(playFile);
+      }, 5); // 1000 milliseconds = 1 second
+    }
   };
 
   const deleteDraftRecording = async (item: string) => {
@@ -117,7 +126,7 @@ const HBRecordBar: React.FC = () => {
   const onStopRecord = async () => {
     setIsRecording(false);
 
-    const result = await audioRecorder.stopRecorder();
+    const result = await audioPlayer.stopRecorder();
 
     var files = await listFiles(recordDir);
 
@@ -146,21 +155,23 @@ const HBRecordBar: React.FC = () => {
   const onStartPlay = async () => {
     isPlayRecording();
 
-    const msg = await audioRecorder.startPlayer(audioURI);
+    const msg = await audioPlayer.startPlayer(audioURI);
     setPlaying(true);
   };
 
   const onPausePlay = async () => {
+    
     if (hasStarted) {
       if (playing) {
         setPlaying(false);
         isNotPlayRecording();
-        await audioRecorder.pausePlayer();
+        await audioPlayer.pausePlayer();
       } else {
         isPlayRecording();
-        await audioRecorder.resumePlayer();
+        await audioPlayer.resumePlayer();
       }
     } else {
+      disableAudio()
       setHasStarted(true);
       onStartPlay();
     }
@@ -178,10 +189,12 @@ const HBRecordBar: React.FC = () => {
   const closeDraftRecordsDialog = () => {
     setDraftRecordsDialogVisible(false);
     disableAudio();
+    setIsPlayingDraft(false);
+    isNotPlayRecording();
   };
 
   const onStopPlay = async () => {
-    audioRecorder.stopPlayer();
+    audioPlayer.stopPlayer();
   };
 
   const openRecordingFolder = () => {
@@ -201,9 +214,13 @@ const HBRecordBar: React.FC = () => {
             size={30}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={{ paddingRight: 20 }} onPress={onPausePlay}>
-          <Icon color="white" source={playing ? "pause" : "play"} size={30} />
-        </TouchableOpacity>
+        {audioURI ? (
+          <TouchableOpacity style={{ paddingRight: 20 }} onPress={onPausePlay}>
+            <Icon color="white" source={playing ? "pause" : "play"} size={30} />
+          </TouchableOpacity>
+        ) : (
+          ""
+        )}
         <TouchableOpacity
           style={{ paddingRight: 20 }}
           onPress={openRecordingFolder}
@@ -241,9 +258,17 @@ const HBRecordBar: React.FC = () => {
                       }}
                     >
                       <TouchableOpacity
-                        onPress={() => playDraftRecording(item)}
+                        onPress={() => playDraftRecording(item, index)}
                       >
-                        <Icon color="black" source="play" size={25} />
+                        <Icon
+                          color="black"
+                          source={
+                            isPlayingDraft && index === draftIndex
+                              ? "stop"
+                              : "play"
+                          }
+                          size={25}
+                        />
                       </TouchableOpacity>
 
                       <Text style={{ fontSize: 15 }}>{item}</Text>

@@ -25,7 +25,6 @@ import AudioPlayer from "./HBAudioPlayer";
 
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 
-
 const { width: screenWidth } = Dimensions.get("screen");
 
 interface HBScriptureCard {
@@ -34,6 +33,7 @@ interface HBScriptureCard {
   title: string;
   notes: any[];
   audioURI: string;
+  setLoading: (loading: boolean) => void;
 }
 
 interface HBScriptureNote {
@@ -62,11 +62,14 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   title,
   notes,
   audioURI,
+  setLoading,
 }) => {
   const [highlightedWords, setHighlightedWords] = useState<string[]>([]);
   const [scriptureImageExist, setScriptureImageExist] = useState(false);
   const [highlightedPhrases, setHighlightedPhrases] = useState<any[]>([]);
   const [highlightedPassage, setHighlightedPassage] = useState<String>("");
+  const [image, setImage] = useState<string | null>(null);
+  const [imageHeight, setImageHeight] = useState<number>(0);
   var isItalic: boolean = false;
   const [opacity, setOpacity] = useState(1);
   const [exegeticalDialogVisible, setExegeticalDialogVisible] = useState(false);
@@ -156,6 +159,15 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   };
 
   useEffect(() => {
+
+    if (imageHeight === 0) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [imageHeight]);
+
+  useEffect(() => {
     if (notes === null || notes === undefined) {
       var modifiedPassage = highlightWords(passageText);
       setHighlightedPassage(modifiedPassage);
@@ -196,8 +208,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   const { t } = useTranslation();
 
   const splitText = highlightedPassage.split("<<<");
-
-  const [image, setImage] = useState<string | null>(null);
 
   const recordDir =
     FileSystem.documentDirectory! +
@@ -420,15 +430,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
         var beginIndex = 0;
 
         sortedItalicsIndexes.map((italicIndex: italics, sortedNdx) => {
-          // textElements.push(
-          //   <Text
-          //     style={{ fontStyle: isItalic ? "italic" : "normal" }}
-          //     key={index * (sortedNdx + 2)}
-          //   >
-          //     {word.substring(beginIndex, italicIndex.index)}
-          //   </Text>
-
-          // );
           superScriptNumbers(
             word.substring(beginIndex, italicIndex.index),
             index * (sortedNdx + 2),
@@ -457,7 +458,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   };
 
   buildScripturePassage();
-  const [imageHeight, setImageHeight] = useState<number>(0);
 
   Image.getSize(imageURI, (imgWidth, imgHeight) => {
     const aspectRatio = imgHeight / imgWidth;

@@ -4,17 +4,15 @@ import Slider from "@react-native-community/slider";
 import { Icon, MD3Colors } from "react-native-paper"; // Adjust this import according to your UI component needs
 import { useAppContext } from "@/context/AppContext";
 
-import  {
-  PlayBackType,
-} from "react-native-audio-recorder-player";
-
+import { PlayBackType } from "react-native-audio-recorder-player";
 
 interface AudioPlayerProps {
   audioUri: string;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
-  const { audioPlayer, enableAudio, audioStop, playRecording } = useAppContext();
+  const { audioPlayer, enableAudio, disableAudio, audioStop, playRecording } =
+    useAppContext();
 
   useEffect(() => {
     if (audioStop) {
@@ -39,8 +37,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
     }
   };
 
-  audioPlayer.addPlayBackListener((status) => onPlaybackStatusUpdate(status));
-
   const onPlaybackStatusUpdate = (status: PlayBackType) => {
     if (playRecording) {
       return;
@@ -57,14 +53,30 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   };
 
   const onStartPlay = async () => {
-    const msg = await audioPlayer.startPlayer(audioUri);
+    console.log("start player")
+    
+    await disableAudio()
+    enableAudio()
+    setPlaying(true);
+    setAudioLoaded(true);
+    
+    setTimeout(() => {
+   
+      audioPlayer.addPlayBackListener((status) => {
+        onPlaybackStatusUpdate(status);
+      });
+      audioPlayer.startPlayer(audioUri)
+    
+    }, 5); // 1000 milliseconds = 1 second
   };
 
   const onPausePlay = async () => {
+    console.log("pauseplayer")
     await audioPlayer.pausePlayer();
   };
 
   const onResumePlay = async () => {
+    console.log("resumeplayer")
     await audioPlayer.resumePlayer();
   };
 
@@ -73,6 +85,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   };
 
   const onPlayPause = async () => {
+    console.log("audioLoaded",audioLoaded)
+    console.log("playing",playing)
     if (audioLoaded) {
       if (playing) {
         await onPausePlay();
@@ -82,8 +96,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
       setPlaying(!playing);
     } else {
       onStartPlay();
-      setPlaying(true);
-      setAudioLoaded(true);
+    
     }
   };
 
