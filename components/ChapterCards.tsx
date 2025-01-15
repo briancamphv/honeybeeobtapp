@@ -99,6 +99,7 @@ const ChapterCards: React.FC<ChapterCards> = ({
               setBackGroundColor={setBackGroundColor}
               setAreChaptersVisible = {setAreChaptersVisible}
               setAreBooksVisible = {setAreBooksVisible}
+              getMultiple={false}
             />
           </View>
         </Card.Content>

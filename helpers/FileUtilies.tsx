@@ -35,11 +35,13 @@ export async function deleteFile(fileUri: string): Promise<void> {
 export const copyAndWriteFile = async (
   sourceUri: string,
   destinationPath: string,
-  FileCopyComplete: any
+  FileCopyComplete: (name:string) => void
 ): Promise<void> => {
   try {
+    
+    
     await FileSystem.copyAsync({ from: sourceUri, to: destinationPath });
-    FileCopyComplete();
+    FileCopyComplete(destinationPath);
   } catch (error) {
     console.error("Error downloading and writing file:", error);
     throw error;

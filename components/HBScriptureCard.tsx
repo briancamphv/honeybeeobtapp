@@ -234,7 +234,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     var destFile = recordDir + "scriptureImage.jpg";
 
     createDirectory(recordDir).then(() => {
-      copyAndWriteFile(image!, destFile, () => null).then(() => {
+      copyAndWriteFile(image!, destFile, (name:string) => null).then(() => {
         changeImage(image);
       });
     });

@@ -187,7 +187,7 @@ const HBRecordBar: React.FC<props> = ({
     var destFile =
       recordDir + translationStep + "_draftv" + (highestNum + 1) + ".mp4";
 
-    await copyAndWriteFile(result, destFile, () => null);
+    await copyAndWriteFile(result, destFile, (name:string) => null);
 
     if (translationStep === "wordstudy") {
       var dirSplit = recordDir.split("/");

@@ -4,11 +4,12 @@ import { StyleSheet, View } from "react-native";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 
-import { List, MD3Colors, Divider } from "react-native-paper";
+import { List, MD3Colors, Divider, Text } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@/context/AppContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GetTemplate from "@/components/GetTemplate";
 
 const Settings: React.FC = () => {
   const navigation = useNavigation();
@@ -59,6 +60,21 @@ const Settings: React.FC = () => {
           />
         </View>
       </List.Section>
+
+      <Divider />
+
+      
+        <GetTemplate
+          book=""
+          template=""
+          setAreBooksVisible={() => {}}
+          setBackGroundColor={() => {}}
+          setAreChaptersVisible={() => {}}
+          getMultiple={true}
+        />
+
+       
+      <Divider />
     </SafeAreaView>
   );
 };
