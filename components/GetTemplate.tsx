@@ -76,7 +76,7 @@ const GetTemplate: React.FC<GetTemplate> = ({
 
         setStep("Translate");
         loadTemplate(template).then(() => {
-          navigation.dispatch(DrawerActions.jumpTo("TranslateAndRevise"));
+          navigation.dispatch(DrawerActions.jumpTo("ScripturePager"));
         });
         setAreBooksVisible(true)
         setAreChaptersVisible(false)

@@ -108,7 +108,18 @@ const TemplateTab: React.FC = () => {
           ),
         }}
       />
+        <Tabs.Screen
+        name="WordData"
+        options={{
+          href: null,
+          title: t("Words", { lng: language }),
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="settings" size={28} color={color} />
+          ),
+        }}
+      />
     </Tabs>
+    
   );
 };
 

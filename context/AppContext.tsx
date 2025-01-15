@@ -102,6 +102,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     require("../assets/data/fr_wordlinks.tsv"),
   ]);
 
+
+
   useEffect(() => {
     if (assets === undefined) {
       return;
@@ -222,7 +224,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   }, [pageNumber]); // Empty dependency array
 
   useEffect(() => {
-    languageSwitcher("fr");
+    languageSwitcher("en");
   }, []);
 
   useEffect(() => {
@@ -419,6 +421,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
           ": " +
           retJSON.passages[pageNumber].verses
       );
+
+     
 
       setTemplatePassages(retJSON.passages);
 

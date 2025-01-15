@@ -10,7 +10,7 @@ const ScripturePager = () => {
   const {
     getPage,
     getNumberOfPages,
-    passageText,
+    templatePassages,
     incrementPageNumber,
     decrementPageNumber,
   } = useAppContext();
@@ -23,7 +23,7 @@ const ScripturePager = () => {
   const [numberOfPages, setNumberOfPages] = useState<number>(0);
 
   useEffect(() => {
-    if (passageText === null) {
+    if (templatePassages === null) {
       return;
     }
 
@@ -40,12 +40,14 @@ const ScripturePager = () => {
           setScripturePages(scriptureArray);
         });
       } else {
-        getPage(ndx).then((scripture) => scriptureArray.push(scripture));
+        getPage(ndx).then((scripture) => {
+          scriptureArray.push(scripture);
+        });
       }
 
       ndx++;
     }
-  }, [passageText]);
+  }, [templatePassages]);
 
   const handlePageSelected = (event: any) => {
     const currentPageIndex = event.nativeEvent.position;
@@ -78,7 +80,6 @@ const ScripturePager = () => {
     <PagerView
       ref={pagerViewRef}
       onPageSelected={handlePageSelected}
-
       style={styles.pagerView}
       initialPage={0}
     >

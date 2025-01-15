@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import WordDialog from "./WordDialog";
+import { WordNote } from "@/interfaces/appInterfaces";
 
 import {
   createDirectory,
@@ -58,13 +60,6 @@ interface italics {
   indexType: string;
 }
 
-interface WordNote {
-  altFormSym: string;
-  otherLangEx: string;
-  meaning: string;
-  relatedTerms: string;
-}
-
 const HBScriptureCard: React.FC<HBScriptureCard> = ({
   imageURI,
   passageText,
@@ -104,7 +99,13 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     setHasRecording,
   } = useAppContext();
 
-  const [wordDialogNote, setWordDialogNote] = useState<WordNote>();
+  const [wordDialogNote, setWordDialogNote] = useState<WordNote>({
+    altFormSym: "",
+    otherLangEx: "",
+    meaning: "",
+    relatedTerms: "",
+    hasRecording: false,
+  });
   const [wordDialogTitle, setWordDialogTitle] = useState<String>("");
 
   const openExegeticalDialog = (ndx: number) => {
@@ -125,7 +126,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       stripWordsofSpecialCharacters(highlightedWords[ndx], '",.;')
     );
 
-    setWordDialogNote(dialogNotes);
+    setWordDialogNote(dialogNotes!);
   };
 
   const closeExegeticalDialog = (av: any) => {
@@ -138,6 +139,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
   const closeWordDialog = () => {
     setWordDialogVisible(false);
+    disableAudio();
   };
 
   const highlightWords = (tokenizedPassage: string): string => {
@@ -169,6 +171,10 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       setLoading(false);
     }
   }, [imageHeight]);
+
+  useEffect(() => {
+    setHighlightedPassage(passageText);
+  }, [passageText]);
 
   useEffect(() => {
     if (notes === null || notes === undefined) {
@@ -211,6 +217,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   const { t } = useTranslation();
 
   const splitText = highlightedPassage.split("<<<");
+  // console.log("splittext",title,splitText,passageText)
 
   const recordDir =
     FileSystem.documentDirectory! +
@@ -655,7 +662,14 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
         </Dialog>
       </Portal>
 
-      <Portal>
+      <WordDialog
+        wordDialogTitle={wordDialogTitle}
+        wordDialogNote={wordDialogNote}
+        closeWordDialog={closeWordDialog}
+        wordDialogVisible={wordDialogVisible}
+      />
+
+      {/* <Portal>
         <Dialog
           style={{ width: screenWidth - 50, maxHeight: safeAreaHeight }}
           visible={wordDialogVisible}
@@ -763,7 +777,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
             />
           </Dialog.Actions>
         </Dialog>
-      </Portal>
+      </Portal> */}
     </>
   );
 };
@@ -807,7 +821,7 @@ const styles = StyleSheet.create({
   },
 
   dialogPhrase: {
-    fontSize: 14,
+    fontSize: 16,
     backgroundColor: "transparent",
     color: "red",
   },
