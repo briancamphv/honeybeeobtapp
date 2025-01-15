@@ -5,3 +5,11 @@ export interface scripture {
     title: string;
     notes: any;
   }
+
+ export interface WordNote {
+    altFormSym: string;
+    otherLangEx: string;
+    meaning: string;
+    relatedTerms: string;
+    hasRecording: boolean;
+  }

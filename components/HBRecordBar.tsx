@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useEffect } from "react";
 
 import {
   StyleSheet,
@@ -7,10 +8,8 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import * as FileSystem from "expo-file-system";
-import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 
-import { Dialog, Portal, Button, Text, Icon } from "react-native-paper";
+import { Dialog, Portal, Text, Icon, IconButton } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 
 import { useAppContext } from "@/context/AppContext";
@@ -22,6 +21,7 @@ import {
   listFiles,
   deleteFile,
   createDirectory,
+  fileExists,
 } from "@/helpers/FileUtilies";
 
 import { PlayBackType } from "react-native-audio-recorder-player";
@@ -32,20 +32,29 @@ import { PlayBackType } from "react-native-audio-recorder-player";
 // }
 
 const { width: screenWidth } = Dimensions.get("screen");
+interface props {
+  recordDir: string;
+  translationStep: string;
+  screenWidthAdj: number;
+}
 
-const HBRecordBar: React.FC = () => {
+const HBRecordBar: React.FC<props> = ({
+  recordDir,
+  translationStep,
+  screenWidthAdj,
+}) => {
   const {
     disableAudio,
     isPlayRecording,
     isNotPlayRecording,
     audioPlayer,
-    template,
-    translationStep,
-    title,
     language,
+    setHasRecording,
   } = useAppContext();
 
   const { t } = useTranslation();
+
+
 
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isPlayingDraft, setIsPlayingDraft] = useState<boolean>(false);
@@ -54,15 +63,6 @@ const HBRecordBar: React.FC = () => {
   const recordingRef = useRef(null);
 
   const [playing, setPlaying] = useState<boolean>(false);
-
-  const recordDir =
-    FileSystem.documentDirectory! +
-    template +
-    "/" +
-    stripWordsofSpecialCharacters(title, ":") +
-    "/" +
-    translationStep +
-    "/";
 
   const [hasStarted, setHasStarted] = useState<boolean>(false);
   const [draftRecordings, setDraftRecordings] = useState<string[]>([]);
@@ -113,14 +113,55 @@ const HBRecordBar: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (translationStep === "wordstudy") {
+      fileExists(recordDir).then((ret) => {
+        if (ret) {
+          listFiles(recordDir).then((files) => {
+            if (files.length === 0) {
+              deleteFile(recordDir);
+              var dirSplit=recordDir.split("/")
+              
+              setHasRecording(dirSplit[dirSplit.length-2],false)
+            }
+          });
+        }
+      });
+    }
+  }, [draftRecordings]);
+
   const deleteDraftRecording = async (item: string) => {
     var playFile = recordDir + item;
 
     setDraftRecordings((prevItems) =>
-      prevItems.filter((entry) => entry !== item)
+      prevItems!.filter((entry) => entry !== item)
     );
 
     deleteFile(playFile);
+  };
+
+  const loadLatestRecording = async () => {
+    var files = await listFiles(recordDir);
+
+    if (files.length === 0) {
+      return;
+    }
+
+    var highestNum = 0;
+
+    files.map((item) => {
+      var itemSplit = item.split("_draftv");
+
+      var num = Number(itemSplit[itemSplit.length - 1].split(".")[0]);
+      if (num > highestNum) {
+        highestNum = num;
+      }
+    });
+
+    var latestFile =
+      recordDir + translationStep + "_draftv" + highestNum + ".mp4";
+
+    setAudioUri(latestFile);
   };
 
   const onStopRecord = async () => {
@@ -148,6 +189,12 @@ const HBRecordBar: React.FC = () => {
 
     await copyAndWriteFile(result, destFile, () => null);
 
+    if (translationStep === "wordstudy") {
+      var dirSplit = recordDir.split("/");
+      var word = dirSplit[dirSplit.length - 2];
+      setHasRecording(word,true)
+    }
+
     setAudioUri(result);
     setHasStarted(false);
   };
@@ -156,11 +203,11 @@ const HBRecordBar: React.FC = () => {
     isPlayRecording();
 
     const msg = await audioPlayer.startPlayer(audioURI);
+
     setPlaying(true);
   };
 
   const onPausePlay = async () => {
-    
     if (hasStarted) {
       if (playing) {
         setPlaying(false);
@@ -171,7 +218,7 @@ const HBRecordBar: React.FC = () => {
         await audioPlayer.resumePlayer();
       }
     } else {
-      disableAudio()
+      disableAudio();
       setHasStarted(true);
       onStartPlay();
     }
@@ -201,9 +248,11 @@ const HBRecordBar: React.FC = () => {
     openDraftRecordsDialog();
   };
 
+  loadLatestRecording();
+
   return (
     <>
-      <View style={styles.title}>
+      <View style={[styles.title, { width: screenWidth - screenWidthAdj }]}>
         <TouchableOpacity
           style={{ paddingRight: 20 }}
           onPress={isRecording ? onStopRecord : onStartRecord}
@@ -243,7 +292,7 @@ const HBRecordBar: React.FC = () => {
               </Dialog.Title>
 
               <Dialog.Content>
-                {draftRecordings.sort().map((item, index) => {
+                {draftRecordings!.sort().map((item, index) => {
                   return (
                     <View
                       key={index}
@@ -286,9 +335,11 @@ const HBRecordBar: React.FC = () => {
           </Dialog.ScrollArea>
 
           <Dialog.Actions>
-            <Button onPress={closeDraftRecordsDialog}>
-              {t("Close", { lng: language })}
-            </Button>
+            <IconButton
+              icon="close-thick"
+              size={32}
+              onPress={closeDraftRecordsDialog}
+            />
           </Dialog.Actions>
         </Dialog>
       </Portal>

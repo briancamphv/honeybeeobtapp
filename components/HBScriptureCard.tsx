@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   createDirectory,
@@ -16,7 +17,14 @@ import checkFileType from "@/helpers/FileTypeCheck";
 import { Alert } from "react-native";
 import { StyleSheet, View, Dimensions, ScrollView, Image } from "react-native";
 
-import { Card, Text, Dialog, Portal, Button } from "react-native-paper";
+import {
+  Card,
+  Text,
+  Dialog,
+  Portal,
+  Modal,
+  IconButton,
+} from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@/context/AppContext";
 
@@ -24,8 +32,9 @@ import AutosizeImage from "@/helpers/AutoSizeImage";
 import AudioPlayer from "./HBAudioPlayer";
 
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
+import HBRecordBar from "./HBRecordBar";
 
-const { width: screenWidth } = Dimensions.get("screen");
+const { width: screenWidth, height: screenHeight } = Dimensions.get("screen");
 
 interface HBScriptureCard {
   imageURI: string;
@@ -72,6 +81,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   const [imageHeight, setImageHeight] = useState<number>(0);
   var isItalic: boolean = false;
   const [opacity, setOpacity] = useState(1);
+
   const [exegeticalDialogVisible, setExegeticalDialogVisible] = useState(false);
   const [wordDialogVisible, setWordDialogVisible] = useState(false);
   const [exegeticalDialogNote, setExegeticalDialogNote] =
@@ -89,8 +99,9 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     revertImage,
     template,
     disableAudio,
-    en_wordData,
-    fr_wordData,
+
+    wordData,
+    setHasRecording,
   } = useAppContext();
 
   const [wordDialogNote, setWordDialogNote] = useState<WordNote>();
@@ -101,19 +112,9 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
     setExegeticalDialogNote(highlightedPhrases[ndx]);
   };
-  var wordData: any = null;
 
-  switch (language) {
-    case "en":
-      wordData = en_wordData;
-      break;
-    case "fr":
-      wordData = fr_wordData;
-
-      break;
-    default:
-    // code block
-  }
+  const insets = useSafeAreaInsets();
+  const safeAreaHeight = screenHeight - (insets.top + insets.bottom);
 
   const openWordDialog = (ndx: number) => {
     setWordDialogVisible(true);
@@ -127,9 +128,12 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     setWordDialogNote(dialogNotes);
   };
 
-  const closeExegeticalDialog = () => {
+  const closeExegeticalDialog = (av: any) => {
     setExegeticalDialogVisible(false);
-    disableAudio();
+
+    if (av) {
+      disableAudio();
+    }
   };
 
   const closeWordDialog = () => {
@@ -159,7 +163,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   };
 
   useEffect(() => {
-
     if (imageHeight === 0) {
       setLoading(true);
     } else {
@@ -390,12 +393,23 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       } else if (word.includes("~wndx~")) {
         var ndx = parseInt(word.substring(6));
 
+        var wordnote = wordData.get(
+          stripWordsofSpecialCharacters(highlightedWords[ndx], ",.;")
+        );
+
+        var hasRecording = wordnote?.hasRecording;
+
         textElements.push(
           <Text
             variant="bodyMedium"
             style={[
               styles.words,
-              { opacity: opacity, fontStyle: isItalic ? "italic" : "normal" },
+              {
+                opacity: opacity,
+                fontStyle: isItalic ? "italic" : "normal",
+                color: hasRecording ? "black" : "blue",
+                textDecorationLine: hasRecording ? "underline" : "none",
+              },
             ]}
             onPress={() => openWordDialog(ndx)}
             onPressIn={() => setOpacity(0.5)}
@@ -470,7 +484,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       <ScrollView
         bounces={false}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 0 }}
         style={styles.card}
       >
         <View style={styles.card}>
@@ -545,20 +558,22 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
       <Portal>
         <Dialog
-          style={{ width: screenWidth - 50 }}
+          style={{ width: screenWidth - 50, maxHeight: safeAreaHeight }}
           visible={exegeticalDialogVisible}
-          onDismiss={closeExegeticalDialog}
+          onDismiss={() => closeExegeticalDialog(exegeticalDialogNote.av)}
           dismissable={false}
         >
           <Dialog.ScrollArea>
             <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
-              <Dialog.Title style={styles.dialogTitle}>
-                {t("Phrase", { lng: language })}:
-              </Dialog.Title>
+              <Dialog.Content>
+                <Text style={styles.dialogPhrase}>
+                  {exegeticalDialogNote.words}
+                </Text>
+              </Dialog.Content>
 
               <Dialog.Content>
-                <Text style={styles.dialogContent}>
-                  {exegeticalDialogNote.words}
+                <Text style={styles.noteContent}>
+                  {exegeticalDialogNote.BEN}
                 </Text>
               </Dialog.Content>
 
@@ -578,19 +593,9 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
                 ""
               )}
 
-              <Dialog.Title style={styles.dialogTitle}>
-                {t("Exegetical Notes", { lng: language })}:
-              </Dialog.Title>
-
-              <Dialog.Content>
-                <Text style={styles.dialogContent}>
-                  {exegeticalDialogNote.BEN}
-                </Text>
-              </Dialog.Content>
-
               {exegeticalDialogNote.comment ? (
                 <Dialog.Title style={styles.dialogTitle}>
-                  {t("Commentary", { lng: language })}:
+                  {t("Comment", { lng: language })}:
                 </Dialog.Title>
               ) : (
                 ""
@@ -641,16 +646,18 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           </Dialog.ScrollArea>
 
           <Dialog.Actions>
-            <Button onPress={closeExegeticalDialog}>
-              {t("Close", { lng: language })}
-            </Button>
+            <IconButton
+              icon="close-thick"
+              size={32}
+              onPress={() => closeExegeticalDialog(exegeticalDialogNote.av)}
+            />
           </Dialog.Actions>
         </Dialog>
       </Portal>
 
       <Portal>
         <Dialog
-          style={{ width: screenWidth - 50 }}
+          style={{ width: screenWidth - 50, maxHeight: safeAreaHeight }}
           visible={wordDialogVisible}
           onDismiss={closeWordDialog}
           dismissable={false}
@@ -662,7 +669,12 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
               </Dialog.Title>
 
               <Dialog.Content>
-                <Text style={styles.dialogContent}>{wordDialogTitle}</Text>
+                <Text style={styles.dialogContent}>
+                  {stripWordsofSpecialCharacters(
+                    wordDialogTitle.toString(),
+                    ".,;"
+                  )}
+                </Text>
               </Dialog.Content>
 
               <Dialog.Title style={styles.dialogTitle}>
@@ -731,10 +743,24 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
             </ScrollView>
           </Dialog.ScrollArea>
 
+          <HBRecordBar
+            translationStep="wordstudy"
+            recordDir={
+              FileSystem.documentDirectory! +
+              language +
+              "/" +
+              stripWordsofSpecialCharacters(wordDialogTitle.toString(), ".,;") +
+              "/"
+            }
+            screenWidthAdj={55}
+          />
+
           <Dialog.Actions>
-            <Button onPress={closeWordDialog}>
-              {t("Close", { lng: language })}
-            </Button>
+            <IconButton
+              icon="close-thick"
+              size={32}
+              onPress={closeWordDialog}
+            />
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -759,6 +785,7 @@ const styles = StyleSheet.create({
 
   words: {
     color: "blue",
+    //textDecorationLine:"underline",
   },
 
   phrases: {
@@ -772,6 +799,17 @@ const styles = StyleSheet.create({
   dialogContent: {
     fontSize: 12,
     backgroundColor: "transparent",
+  },
+
+  noteContent: {
+    fontSize: 14,
+    backgroundColor: "transparent",
+  },
+
+  dialogPhrase: {
+    fontSize: 14,
+    backgroundColor: "transparent",
+    color: "red",
   },
 
   dialogTitle: {

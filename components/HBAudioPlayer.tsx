@@ -53,30 +53,24 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   };
 
   const onStartPlay = async () => {
-    console.log("start player")
-    
-    await disableAudio()
-    enableAudio()
+    await disableAudio();
+    enableAudio();
     setPlaying(true);
     setAudioLoaded(true);
-    
+
     setTimeout(() => {
-   
       audioPlayer.addPlayBackListener((status) => {
         onPlaybackStatusUpdate(status);
       });
-      audioPlayer.startPlayer(audioUri)
-    
+      audioPlayer.startPlayer(audioUri);
     }, 5); // 1000 milliseconds = 1 second
   };
 
   const onPausePlay = async () => {
-    console.log("pauseplayer")
     await audioPlayer.pausePlayer();
   };
 
   const onResumePlay = async () => {
-    console.log("resumeplayer")
     await audioPlayer.resumePlayer();
   };
 
@@ -85,8 +79,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
   };
 
   const onPlayPause = async () => {
-    console.log("audioLoaded",audioLoaded)
-    console.log("playing",playing)
     if (audioLoaded) {
       if (playing) {
         await onPausePlay();
@@ -96,7 +88,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
       setPlaying(!playing);
     } else {
       onStartPlay();
-    
     }
   };
 

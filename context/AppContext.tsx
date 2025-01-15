@@ -8,16 +8,12 @@ import AudioRecorderPlayer, {
   PlayBackType,
 } from "react-native-audio-recorder-player";
 
+import { listFiles } from "@/helpers/FileUtilies";
+import { WordNote } from "@/interfaces/appInterfaces";
+
 const audioPlayer = new AudioRecorderPlayer();
 
 // Define the type for the context values
-
-interface WordNote {
-  altFormSym: string;
-  otherLangEx: string;
-  meaning: string;
-  relatedTerms: string;
-}
 
 interface AppContextType {
   count: number;
@@ -28,7 +24,7 @@ interface AppContextType {
   decrementPageNumber: () => void;
   changePageNumber: (pgNbr: number) => void;
   enableAudio: () => void;
-  disableAudio: () => Promise<void>;
+  disableAudio: () => void;
   isPlayRecording: () => void;
   isNotPlayRecording: () => void;
   setStep: (step: string) => void;
@@ -37,6 +33,7 @@ interface AppContextType {
   revertImage: () => void;
   getPage: (pageNumber: number) => Promise<scripture>;
   getNumberOfPages: () => number;
+  setHasRecording: (key: string, hasRecording: boolean) => void;
   audioPlayer: AudioRecorderPlayer;
   language: string;
   translationStep: string;
@@ -51,6 +48,7 @@ interface AppContextType {
   templatePassages: any[];
   en_wordData: Map<string, WordNote>;
   fr_wordData: Map<string, WordNote>;
+  wordData: Map<string, WordNote>;
 }
 
 // Create the context
@@ -97,6 +95,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     new Map()
   );
 
+  const [wordData, setWordData] = useState<Map<string, WordNote>>(new Map());
+
   const [assets, error] = useAssets([
     require("../assets/data/en_wordlinks.tsv"),
     require("../assets/data/fr_wordlinks.tsv"),
@@ -109,21 +109,27 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
 
     const fetchData = async (uri: string, name: string) => {
       try {
+        var wordLang = name.substring(0, 2);
+        const recordDir = FileSystem.documentDirectory! + wordLang + "/";
+
+        var fileList = await listFiles(recordDir);
+
         const fileContent = await FileSystem.readAsStringAsync(uri);
         const lines = fileContent.split("\r\n");
 
-        var wordLang = name.substring(0, 2);
         // skip header line
         const dataLines = lines.slice(1);
         const wordMap = new Map();
 
         dataLines.map((line) => {
           var fields = line.split("\t");
+
           var JSON = {
             altFormSym: fields[2],
             otherLangEx: fields[3],
             meaning: fields[4],
             relatedTerms: fields[5],
+            hasRecording: fileList.includes(fields[1]),
           };
 
           wordMap.set(fields[1], JSON);
@@ -132,6 +138,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         switch (wordLang) {
           case "en":
             setEN_WordData(wordMap);
+            setWordData(wordMap);
 
             break;
           case "fr":
@@ -148,6 +155,15 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
 
     assets!.map((asset) => {
       fetchData(asset!.localUri!, asset!.name!);
+      switch (language) {
+        case "en":
+          setWordData(en_wordData);
+          break;
+        case "fr":
+          setWordData(fr_wordData);
+          break;
+        default:
+      }
     });
   }, [assets]);
 
@@ -206,7 +222,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   }, [pageNumber]); // Empty dependency array
 
   useEffect(() => {
-    languageSwitcher("en");
+    languageSwitcher("fr");
   }, []);
 
   useEffect(() => {
@@ -236,6 +252,18 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
 
   function languageSwitcher(lng: string) {
     setLanguage(lng);
+
+    switch (lng) {
+      case "en":
+        setWordData(en_wordData);
+
+        break;
+      case "fr":
+        setWordData(fr_wordData);
+
+        break;
+      default:
+    }
   }
 
   function incrementPageNumber() {
@@ -409,10 +437,10 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     setCount(count - 1);
   };
 
-  const disableAudio = async (): Promise<void> => {
+  const disableAudio = (): void => {
     audioPlayer.removePlayBackListener();
     setAudioStop(true);
-    await audioPlayer.stopPlayer();
+    audioPlayer.stopPlayer();
   };
 
   const enableAudio = () => {
@@ -426,6 +454,45 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   const isNotPlayRecording = () => {
     setPlayRecording(false);
   };
+
+  function setHasRecording(key: string, hasRecording: boolean) {
+    setWordData((prevMap) => {
+      const newMap = new Map(prevMap);
+      const existingObject = newMap.get(key);
+
+      if (existingObject) {
+        newMap.set(key, { ...existingObject, hasRecording: hasRecording });
+      }
+
+      return newMap;
+    });
+
+    switch (language) {
+      case "en":
+        setEN_WordData((prevMap) => {
+          const newMap = new Map(prevMap);
+          const existingObject = newMap.get(key);
+
+          if (existingObject) {
+            newMap.set(key, { ...existingObject, hasRecording: hasRecording });
+          }
+
+          return newMap;
+        });
+      case "fr":
+        setFR_WordData((prevMap) => {
+          const newMap = new Map(prevMap);
+          const existingObject = newMap.get(key);
+
+          if (existingObject) {
+            newMap.set(key, { ...existingObject, hasRecording: hasRecording });
+          }
+
+          return newMap;
+        });
+      default:
+    }
+  }
 
   return (
     <AppContext.Provider
@@ -441,11 +508,12 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         template,
         en_wordData,
         fr_wordData,
+        wordData,
         playRecording,
         translationStep,
         language,
         audioPlayer,
-
+        setHasRecording,
         changePageNumber,
         changeImage,
         revertImage,

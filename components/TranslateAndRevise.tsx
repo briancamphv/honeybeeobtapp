@@ -15,6 +15,10 @@ import HBScriptureCard from "@/components/HBScriptureCard";
 import HBRecordBar from "@/components/HBRecordBar";
 
 import { scripture } from "../interfaces/appInterfaces";
+import { useAppContext } from "@/context/AppContext";
+import * as FileSystem from "expo-file-system";
+import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
+
 
 const TranslateAndRevise: React.FC<scripture> = ({
   imageURI,
@@ -29,6 +33,17 @@ const TranslateAndRevise: React.FC<scripture> = ({
   const setLoading = (loading: boolean): void => {
     setIsLoading(loading);
   };
+
+  const {translationStep, template, setHasRecording} = useAppContext()
+
+   const recordDir =
+      FileSystem.documentDirectory! +
+      template +
+      "/" +
+      stripWordsofSpecialCharacters(title, ":") +
+      "/" +
+      translationStep +
+      "/";
 
   return (
     <SafeAreaView style={styles.container}>
@@ -50,7 +65,7 @@ const TranslateAndRevise: React.FC<scripture> = ({
           audioURI={audioURI}
           setLoading={setLoading}
         />
-        <HBRecordBar />
+        <HBRecordBar recordDir={recordDir} translationStep={translationStep} screenWidthAdj={0}/>
       </View>
 
       <Portal>
