@@ -35,11 +35,9 @@ export async function deleteFile(fileUri: string): Promise<void> {
 export const copyAndWriteFile = async (
   sourceUri: string,
   destinationPath: string,
-  FileCopyComplete: (name:string) => void
+  FileCopyComplete: (name: string) => void
 ): Promise<void> => {
   try {
-    
-    
     await FileSystem.copyAsync({ from: sourceUri, to: destinationPath });
     FileCopyComplete(destinationPath);
   } catch (error) {
@@ -66,7 +64,17 @@ export const createDirectory = async (directoryName: string) => {
   }
 };
 
-
+export const readJSONData = async (fileUri: string) => {
+  try {
+    const jsonData = await FileSystem.readAsStringAsync(fileUri);
+    
+    const jsonRet = JSON.parse(jsonData);
+  
+    return jsonRet;
+  } catch (error) {
+    console.error("Error reading file:", error);
+  }
+};
 
 export const createFileFromString = async (
   filePath: string,
@@ -74,6 +82,18 @@ export const createFileFromString = async (
 ) => {
   try {
     await FileSystem.writeAsStringAsync(filePath, fileContent);
+  } catch (error) {
+    console.error("Error creating file:", error);
+  }
+};
+
+export const createFileFromJSON = async (
+  filePath: string,
+  fileContent: {}
+) => {
+  try {
+    console.log("fileContent",fileContent)
+    await FileSystem.writeAsStringAsync(filePath, JSON.stringify(fileContent));
   } catch (error) {
     console.error("Error creating file:", error);
   }

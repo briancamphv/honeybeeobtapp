@@ -1,7 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
 import { useAssets } from "expo-asset";
-import { fileExists } from "@/helpers/FileUtilies";
+import {
+  fileExists,
+  readJSONData,
+  createFileFromJSON,
+} from "@/helpers/FileUtilies";
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
 import { scripture } from "@/interfaces/appInterfaces";
 import AudioRecorderPlayer, {
@@ -10,6 +14,10 @@ import AudioRecorderPlayer, {
 
 import { listFiles } from "@/helpers/FileUtilies";
 import { WordNote } from "@/interfaces/appInterfaces";
+
+import { appState } from "@/interfaces/appInterfaces";
+
+
 
 const audioPlayer = new AudioRecorderPlayer();
 
@@ -54,6 +62,7 @@ interface AppContextType {
 // Create the context
 const AppContext = createContext<AppContextType | null>(null);
 
+
 // Create a custom hook to use the context
 const useAppContext = () => {
   const context = useContext(AppContext);
@@ -95,6 +104,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     new Map()
   );
 
+  const fileAppStateURI = FileSystem.documentDirectory! + "appState.json";
+
   const [wordData, setWordData] = useState<Map<string, WordNote>>(new Map());
 
   const [assets, error] = useAssets([
@@ -102,7 +113,19 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     require("../assets/data/fr_wordlinks.tsv"),
   ]);
 
+  useEffect(() => {
+    if (template === "" || language === "" || translationStep === "") {
+      return;
+    }
 
+    var currentState: appState = {
+      template: template,
+      tranlationStep: translationStep,
+      language: language,
+    };
+
+    createFileFromJSON(fileAppStateURI, currentState);
+  }, [template, language, translationStep]);
 
   useEffect(() => {
     if (assets === undefined) {
@@ -224,7 +247,16 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   }, [pageNumber]); // Empty dependency array
 
   useEffect(() => {
-    languageSwitcher("en");
+    fileExists(fileAppStateURI).then((exists) => {
+      if (exists) {
+        readJSONData(fileAppStateURI).then((retJSON) => {
+          console.log("retJSON", retJSON.template);
+          languageSwitcher(retJSON.language);
+          setStep(retJSON.tranlationStep);
+          loadTemplate(retJSON.template).then(() => {});
+        });
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -421,8 +453,6 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
           ": " +
           retJSON.passages[pageNumber].verses
       );
-
-     
 
       setTemplatePassages(retJSON.passages);
 

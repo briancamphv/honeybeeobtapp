@@ -16,10 +16,13 @@ import {
   PaperProvider,
 } from "react-native-paper";
 
+import { useLocalSearchParams } from 'expo-router';
+
 import { useTranslation } from "react-i18next";
 
 import { useAppContext } from "@/context/AppContext";
 import { useState } from "react";
+import { useNavigation } from "expo-router";
 
 const TemplateTab: React.FC = () => {
   const theme = {
@@ -31,6 +34,8 @@ const TemplateTab: React.FC = () => {
       secondary: "yellow",
     },
   };
+
+  const {navigate} = useNavigation()
 
   const { t } = useTranslation();
 
@@ -69,7 +74,6 @@ const TemplateTab: React.FC = () => {
         <Tabs.Screen
           name="ScripturePager"
           options={{
-          
             title: t("Translate", { lng: language }),
             tabBarIcon: ({ color }) => (
               <Ionicons name="language" size={28} color={color} />
@@ -108,7 +112,7 @@ const TemplateTab: React.FC = () => {
           ),
         }}
       />
-        <Tabs.Screen
+      <Tabs.Screen
         name="WordData"
         options={{
           href: null,
@@ -118,8 +122,19 @@ const TemplateTab: React.FC = () => {
           ),
         }}
       />
+
+      <Tabs.Screen
+        name="HelpHTMLViewer"
+        
+        options={{
+          href: null,
+          title: t("Words", { lng: language }),
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="settings" size={28} color={color} />
+          ),
+        }}
+      />
     </Tabs>
-    
   );
 };
 

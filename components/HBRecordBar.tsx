@@ -54,8 +54,6 @@ const HBRecordBar: React.FC<props> = ({
 
   const { t } = useTranslation();
 
-
-
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isPlayingDraft, setIsPlayingDraft] = useState<boolean>(false);
   const [draftIndex, setDraftIndex] = useState<number>(-1);
@@ -120,14 +118,18 @@ const HBRecordBar: React.FC<props> = ({
           listFiles(recordDir).then((files) => {
             if (files.length === 0) {
               deleteFile(recordDir);
-              var dirSplit=recordDir.split("/")
+              var dirSplit = recordDir.split("/");
+
+              setHasRecording(dirSplit[dirSplit.length - 2], false);
               
-              setHasRecording(dirSplit[dirSplit.length-2],false)
             }
           });
         }
       });
     }
+    if (draftRecordings.length === 0) {
+      setAudioUri("")
+    } 
   }, [draftRecordings]);
 
   const deleteDraftRecording = async (item: string) => {
@@ -159,7 +161,7 @@ const HBRecordBar: React.FC<props> = ({
     });
 
     var latestFile =
-      recordDir + translationStep + "_draftv" + highestNum + ".mp4";
+      recordDir + t(translationStep, { lng: language }) + "_draftv" + highestNum + ".mp4";
 
     setAudioUri(latestFile);
   };
@@ -185,14 +187,14 @@ const HBRecordBar: React.FC<props> = ({
     await createDirectory(recordDir);
 
     var destFile =
-      recordDir + translationStep + "_draftv" + (highestNum + 1) + ".mp4";
+      recordDir + t(translationStep, { lng: language }) + "_draftv" + (highestNum + 1) + ".mp4";
 
-    await copyAndWriteFile(result, destFile, (name:string) => null);
+    await copyAndWriteFile(result, destFile, (name: string) => null);
 
     if (translationStep === "wordstudy") {
       var dirSplit = recordDir.split("/");
       var word = dirSplit[dirSplit.length - 2];
-      setHasRecording(word,true)
+      setHasRecording(word, true);
     }
 
     setAudioUri(result);
@@ -264,18 +266,27 @@ const HBRecordBar: React.FC<props> = ({
           />
         </TouchableOpacity>
         {audioURI ? (
-          <TouchableOpacity style={{ paddingRight: 20 }} onPress={onPausePlay}>
-            <Icon color="white" source={playing ? "pause" : "play"} size={30} />
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity
+              style={{ paddingRight: 20 }}
+              onPress={onPausePlay}
+            >
+              <Icon
+                color="white"
+                source={playing ? "pause" : "play"}
+                size={30}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ paddingRight: 20 }}
+              onPress={openRecordingFolder}
+            >
+              <Icon color="white" source={"folder-edit-outline"} size={30} />
+            </TouchableOpacity>
+          </>
         ) : (
           ""
         )}
-        <TouchableOpacity
-          style={{ paddingRight: 20 }}
-          onPress={openRecordingFolder}
-        >
-          <Icon color="white" source={"folder-edit-outline"} size={30} />
-        </TouchableOpacity>
       </View>
 
       <Portal>

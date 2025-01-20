@@ -13,3 +13,9 @@ export interface scripture {
     relatedTerms: string;
     hasRecording: boolean;
   }
+
+  export interface appState {
+    template: string;
+    tranlationStep: string;
+    language: string;
+  }

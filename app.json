@@ -2,7 +2,7 @@
   "expo": {
     "name": "HoneyBeeOBTApp",
     "slug": "HoneyBeeOBTApp",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -18,7 +18,7 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 10,
+      "versionCode": 12,
       "package": "com.briancamphv.HoneyBeeOBTApp",
       "permissions": [
         "android.permission.RECORD_AUDIO",
@@ -35,7 +35,7 @@
         "expo-av",
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
-        }       
+        }
       ],
       [
         "expo-image-picker",

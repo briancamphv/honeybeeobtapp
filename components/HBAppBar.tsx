@@ -9,21 +9,33 @@ import { useTranslation } from "react-i18next";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 import { useAppContext } from "@/context/AppContext";
-import { Help } from "@/helpers/Enumerators";
+import navigateWithParams from "@/helpers/NavigateHelper";
+import { navigateToScreen } from "@/helpers/NavigateHelper";
 
+type htmlHelpRouteParams = {
+  helpFile: string;
+};
 
 const HBAppBar: React.FC = () => {
   const navigation = useNavigation();
-
-  const [helpDialogVisible, setHelpDialogVisible] =
-    React.useState<boolean>(false);
-  var helpAsset = "";
 
   const onNavigate = (dest: string) => {
     navigation.dispatch(DrawerActions.jumpTo(dest));
   };
 
-  const openHelpDialog = () => setHelpDialogVisible(true);
+  const [helpDialogVisible, setHelpDialogVisible] =
+    React.useState<boolean>(false);
+  var helpAsset = "";
+
+  const handleNavigate = () => {
+    navigateWithParams(navigation, "HelpHTMLViewer", { helpFile: "translate" });
+  };
+
+  const openHelpDialog = () => handleNavigate();
+
+  // navigateToScreen(navigation,"HelpHTMLViewer")
+
+  //const openHelpDialog = () => setHelpDialogVisible(true);
   const closeHelpDialog = () => setHelpDialogVisible(false);
 
   const { language } = useAppContext();
