@@ -40,6 +40,8 @@ interface AppContextType {
   getPage: (pageNumber: number) => Promise<scripture>;
   getNumberOfPages: () => number;
   setHasRecording: (key: string, hasRecording: boolean) => void;
+  setPlayingDraft: (state:boolean) => void;
+  isPlayingDraft: boolean;
   audioPlayer: AudioRecorderPlayer;
   language: string;
   translationStep: string;
@@ -87,6 +89,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   const [template, setTemplate] = useState<string>("");
   const [language, setLanguage] = useState<string>("en");
   const [pageNumber, setPageNumber] = useState<number>(0);
+  const [isPlayingDraft, setIsPlayingDraft] = useState<boolean>(false);
 
   const [audioStop, setAudioStop] = useState<boolean>(false);
   const [playRecording, setPlayRecording] = useState<boolean>(false);
@@ -282,6 +285,10 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         "/audioVisual/" +
         templateJSON.passages[pageNumber].image
     );
+  }
+
+  const setPlayingDraft = (state:boolean) => {
+    setIsPlayingDraft(state)
   }
 
   function languageSwitcher(lng: string) {
@@ -547,6 +554,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         translationStep,
         language,
         audioPlayer,
+        isPlayingDraft,
+        setPlayingDraft,
         setHasRecording,
         changePageNumber,
         changeImage,

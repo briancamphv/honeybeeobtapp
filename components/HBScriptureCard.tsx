@@ -157,7 +157,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       ).trim();
 
       if (wordData.get(newWord)) {
-        
         modifiedPassage = modifiedPassage.replace(
           newWord,
           "<<<~wndx~" + ndx + "<<<"
@@ -572,7 +571,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
 
       <Portal>
         <Dialog
-          style={{ width: screenWidth - 50, maxHeight: safeAreaHeight }}
+          style={{ width: screenWidth - 50, maxHeight: safeAreaHeight - 25 }}
           visible={exegeticalDialogVisible}
           onDismiss={() => closeExegeticalDialog(exegeticalDialogNote.av)}
           dismissable={false}
@@ -675,116 +674,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
         closeWordDialog={closeWordDialog}
         wordDialogVisible={wordDialogVisible}
       />
-
-      {/* <Portal>
-        <Dialog
-          style={{ width: screenWidth - 50, maxHeight: safeAreaHeight }}
-          visible={wordDialogVisible}
-          onDismiss={closeWordDialog}
-          dismissable={false}
-        >
-          <Dialog.ScrollArea>
-            <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
-              <Dialog.Title style={styles.dialogTitle}>
-                {t("Word Study", { lng: language })}:
-              </Dialog.Title>
-
-              <Dialog.Content>
-                <Text style={styles.dialogContent}>
-                  {stripWordsofSpecialCharacters(
-                    wordDialogTitle.toString(),
-                    ".,;"
-                  )}
-                </Text>
-              </Dialog.Content>
-
-              <Dialog.Title style={styles.dialogTitle}>
-                {t("Meaning", { lng: language })}:
-              </Dialog.Title>
-
-              <Dialog.Content>
-                <Text style={styles.dialogContent}>
-                  {wordDialogNote?.meaning}
-                </Text>
-              </Dialog.Content>
-
-              {wordDialogNote?.altFormSym ? (
-                <Dialog.Title style={styles.dialogTitle}>
-                  {t("Alternate Forms or Synonyms", { lng: language })}:
-                </Dialog.Title>
-              ) : (
-                ""
-              )}
-
-              {wordDialogNote?.altFormSym ? (
-                <Dialog.Content>
-                  <Text style={styles.dialogContent}>
-                    {wordDialogNote.altFormSym}
-                  </Text>
-                </Dialog.Content>
-              ) : (
-                ""
-              )}
-
-              {wordDialogNote?.otherLangEx ? (
-                <Dialog.Title style={styles.dialogTitle}>
-                  {t("Other Language Examples", { lng: language })}:
-                </Dialog.Title>
-              ) : (
-                ""
-              )}
-
-              {wordDialogNote?.otherLangEx ? (
-                <Dialog.Content>
-                  <Text style={styles.dialogContent}>
-                    {wordDialogNote.otherLangEx}
-                  </Text>
-                </Dialog.Content>
-              ) : (
-                ""
-              )}
-
-              {wordDialogNote?.relatedTerms ? (
-                <Dialog.Title style={styles.dialogTitle}>
-                  {t("Related Terms", { lng: language })}:
-                </Dialog.Title>
-              ) : (
-                ""
-              )}
-
-              {wordDialogNote?.relatedTerms ? (
-                <Dialog.Content>
-                  <Text style={styles.dialogContent}>
-                    {wordDialogNote.relatedTerms}
-                  </Text>
-                </Dialog.Content>
-              ) : (
-                ""
-              )}
-            </ScrollView>
-          </Dialog.ScrollArea>
-
-          <HBRecordBar
-            translationStep="wordstudy"
-            recordDir={
-              FileSystem.documentDirectory! +
-              language +
-              "/" +
-              stripWordsofSpecialCharacters(wordDialogTitle.toString(), ".,;") +
-              "/"
-            }
-            screenWidthAdj={55}
-          />
-
-          <Dialog.Actions>
-            <IconButton
-              icon="close-thick"
-              size={32}
-              onPress={closeWordDialog}
-            />
-          </Dialog.Actions>
-        </Dialog>
-      </Portal> */}
     </>
   );
 };

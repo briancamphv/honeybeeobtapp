@@ -2,7 +2,7 @@
   "expo": {
     "name": "HoneyBeeOBTApp",
     "slug": "HoneyBeeOBTApp",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -18,7 +18,7 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 15,
+      "versionCode": 16,
       "package": "com.briancamphv.HoneyBeeOBTApp",
       "permissions": [
         "android.permission.RECORD_AUDIO",

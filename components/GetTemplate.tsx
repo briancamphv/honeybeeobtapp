@@ -1,5 +1,6 @@
 import * as DocumentPicker from "expo-document-picker";
 import React, { useState, useEffect, FC } from "react";
+import { TouchableRipple } from "react-native-paper";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import { listFiles } from "@/helpers/FileUtilies";
@@ -179,7 +180,7 @@ const GetTemplate: React.FC<GetTemplate> = ({
   } else if (getMultiple) {
 
     return (
-      <TouchableOpacity onPress={handleFileSelect}>
+      <TouchableRipple onPress={handleFileSelect}>
         <View style={{ flexDirection: "row", alignItems: "center", marginLeft: 8 }}>
           <IconButton icon="import" iconColor={"black"} size={24} />
 
@@ -187,7 +188,7 @@ const GetTemplate: React.FC<GetTemplate> = ({
             {t("Template Bulk Import", { lng: language })}
           </Text>
         </View>
-      </TouchableOpacity>
+      </TouchableRipple>
     );
   }
 };

@@ -31,10 +31,10 @@ const WordDialog: React.FC<prop> = ({
   return (
     <Portal>
       <Dialog
-        style={{ width: screenWidth - 50, maxHeight: safeAreaHeight }}
+        style={{ width: screenWidth - 50, maxHeight: safeAreaHeight - 25 }}
         visible={wordDialogVisible}
         onDismiss={() => {
-          closeWordDialog();     
+          closeWordDialog();
         }}
         dismissable={false}
       >

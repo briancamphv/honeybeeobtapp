@@ -47,6 +47,8 @@ const HBRecordBar: React.FC<props> = ({
     disableAudio,
     isPlayRecording,
     isNotPlayRecording,
+    setPlayingDraft,
+    isPlayingDraft,
     audioPlayer,
     language,
     setHasRecording,
@@ -55,12 +57,10 @@ const HBRecordBar: React.FC<props> = ({
   const { t } = useTranslation();
 
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [isPlayingDraft, setIsPlayingDraft] = useState<boolean>(false);
 
   const [draftIndex, setDraftIndex] = useState<number>(-1);
 
   const [playing, setPlaying] = useState<boolean>(false);
-  const [playingDraftStopped, setPlayingDraftStopped] = useState<boolean>(false);
 
   const [hasStarted, setHasStarted] = useState<boolean>(false);
   const [draftRecordings, setDraftRecordings] = useState<string[]>([]);
@@ -75,8 +75,8 @@ const HBRecordBar: React.FC<props> = ({
       setPlaying(false);
       setHasStarted(false);
       isNotPlayRecording();
-      setPlayingDraftStopped(true); 
-      setIsPlayingDraft(false);
+
+      setPlayingDraft(false);
     }
   };
 
@@ -90,15 +90,13 @@ const HBRecordBar: React.FC<props> = ({
   const playDraftRecording = async (item: string, index: number) => {
     setDraftIndex(index);
 
-    setPlayingDraftStopped(false);
-
     if (isPlayingDraft) {
-      setIsPlayingDraft(false);
+      setPlayingDraft(false);
       isNotPlayRecording();
       audioPlayer.stopPlayer();
     } else {
       isPlayRecording();
-      setIsPlayingDraft(true);
+      setPlayingDraft(true);
       var playFile = recordDir + item;
 
       disableAudio();
@@ -250,7 +248,7 @@ const HBRecordBar: React.FC<props> = ({
   const closeDraftRecordsDialog = () => {
     setDraftRecordsDialogVisible(false);
     disableAudio();
-    setIsPlayingDraft(false);
+    setPlayingDraft(false);
     isNotPlayRecording();
   };
 
@@ -334,7 +332,7 @@ const HBRecordBar: React.FC<props> = ({
                         <Icon
                           color="black"
                           source={
-                            (isPlayingDraft || !playingDraftStopped) && index === draftIndex
+                            isPlayingDraft && index === draftIndex
                               ? "stop"
                               : "play"
                           }
@@ -342,7 +340,7 @@ const HBRecordBar: React.FC<props> = ({
                         />
                       </TouchableOpacity>
 
-                      <Text style={{ fontSize: 12 }}>{item}</Text>
+                      <Text style={{ fontSize: 14 }}>{item}</Text>
 
                       <TouchableOpacity
                         onPress={() => deleteDraftRecording(item)}
