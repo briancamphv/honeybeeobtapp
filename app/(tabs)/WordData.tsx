@@ -23,7 +23,7 @@ const WordData = () => {
   const { wordData,disableAudio } = useAppContext();
 
   useEffect(() => {
-    console.log("useEffect");
+
     var entries: wordData[] = [];
     wordData.forEach((item, key) => {
       entries.push({
@@ -132,6 +132,7 @@ const WordData = () => {
         data={filteredItems}
         renderItem={renderItem}
         keyExtractor={(item) => item.word}
+        contentContainerStyle={{ paddingBottom: 60 }}
       />
       <WordDialog
         wordDialogTitle={wordDialogTitle}

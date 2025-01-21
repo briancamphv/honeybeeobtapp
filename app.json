@@ -18,7 +18,7 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 12,
+      "versionCode": 15,
       "package": "com.briancamphv.HoneyBeeOBTApp",
       "permissions": [
         "android.permission.RECORD_AUDIO",

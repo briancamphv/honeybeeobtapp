@@ -82,7 +82,7 @@ const HBAppBar: React.FC = () => {
                 <List.Icon {...props} color="white" icon="account-multiple" />
               )}
               title={t("Community Work", { lng: language })}
-              onPress={() => onNavigate("index")}
+              onPress={() => onNavigate("Templates")}
             />
             <List.Item
               style={{ backgroundColor: "blue" }}
@@ -95,7 +95,7 @@ const HBAppBar: React.FC = () => {
                 <List.Icon {...props} color="white" icon="bullseye-arrow" />
               )}
               title={t("Accuracy Check", { lng: language })}
-              onPress={() => onNavigate("BibleBookList")}
+              onPress={() => onNavigate("Templates")}
             />
           </List.Accordion>
         </List.Section>

@@ -17,8 +17,6 @@ import { WordNote } from "@/interfaces/appInterfaces";
 
 import { appState } from "@/interfaces/appInterfaces";
 
-
-
 const audioPlayer = new AudioRecorderPlayer();
 
 // Define the type for the context values
@@ -61,7 +59,6 @@ interface AppContextType {
 
 // Create the context
 const AppContext = createContext<AppContextType | null>(null);
-
 
 // Create a custom hook to use the context
 const useAppContext = () => {
@@ -163,11 +160,12 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         switch (wordLang) {
           case "en":
             setEN_WordData(wordMap);
-            setWordData(wordMap);
+            //  setWordData(wordMap);
 
             break;
           case "fr":
             setFR_WordData(wordMap);
+            //setWordData(wordMap);
 
             break;
           default:
@@ -180,17 +178,20 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
 
     assets!.map((asset) => {
       fetchData(asset!.localUri!, asset!.name!);
-      switch (language) {
-        case "en":
-          setWordData(en_wordData);
-          break;
-        case "fr":
-          setWordData(fr_wordData);
-          break;
-        default:
-      }
     });
   }, [assets]);
+
+  useEffect(() => {
+    switch (language) {
+      case "en":
+        setWordData(en_wordData);
+        break;
+      case "fr":
+        setWordData(fr_wordData);
+        break;
+      default:
+    }
+  }, [en_wordData, fr_wordData]);
 
   useEffect(() => {
     if (Object.keys(templateJSON).length === 0) {
@@ -250,7 +251,6 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     fileExists(fileAppStateURI).then((exists) => {
       if (exists) {
         readJSONData(fileAppStateURI).then((retJSON) => {
-          console.log("retJSON", retJSON.template);
           languageSwitcher(retJSON.language);
           setStep(retJSON.tranlationStep);
           loadTemplate(retJSON.template).then(() => {});

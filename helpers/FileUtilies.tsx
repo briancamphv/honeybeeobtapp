@@ -92,7 +92,7 @@ export const createFileFromJSON = async (
   fileContent: {}
 ) => {
   try {
-    console.log("fileContent",fileContent)
+ 
     await FileSystem.writeAsStringAsync(filePath, JSON.stringify(fileContent));
   } catch (error) {
     console.error("Error creating file:", error);

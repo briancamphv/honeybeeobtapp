@@ -33,7 +33,10 @@ import { useAppContext } from "@/context/AppContext";
 import AutosizeImage from "@/helpers/AutoSizeImage";
 import AudioPlayer from "./HBAudioPlayer";
 
-import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
+import stripWordsofSpecialCharacters, {
+  stripWordsofTokens,
+} from "@/helpers/StringFunctions";
+
 import HBRecordBar from "./HBRecordBar";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("screen");
@@ -148,19 +151,24 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     var modifiedPassage = tokenizedPassage;
 
     tokenizedPassage.split(" ").map((word, index) => {
-      var newWord = stripWordsofSpecialCharacters(word, '",.;');
+      var newWord = stripWordsofTokens(
+        stripWordsofSpecialCharacters(word, '",.;!'),
+        "<i>,</i>,«,»"
+      ).trim();
 
       if (wordData.get(newWord)) {
+        
         modifiedPassage = modifiedPassage.replace(
-          word,
+          newWord,
           "<<<~wndx~" + ndx + "<<<"
         );
 
-        wordLinks.push(word);
+        wordLinks.push(newWord);
         ndx++;
       }
     });
     setHighlightedWords(wordLinks);
+
     return modifiedPassage;
   };
 
@@ -217,7 +225,6 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   const { t } = useTranslation();
 
   const splitText = highlightedPassage.split("<<<");
-  // console.log("splittext",title,splitText,passageText)
 
   const recordDir =
     FileSystem.documentDirectory! +
@@ -234,7 +241,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     var destFile = recordDir + "scriptureImage.jpg";
 
     createDirectory(recordDir).then(() => {
-      copyAndWriteFile(image!, destFile, (name:string) => null).then(() => {
+      copyAndWriteFile(image!, destFile, (name: string) => null).then(() => {
         changeImage(image);
       });
     });

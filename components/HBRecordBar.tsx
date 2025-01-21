@@ -56,11 +56,11 @@ const HBRecordBar: React.FC<props> = ({
 
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isPlayingDraft, setIsPlayingDraft] = useState<boolean>(false);
+
   const [draftIndex, setDraftIndex] = useState<number>(-1);
 
-  const recordingRef = useRef(null);
-
   const [playing, setPlaying] = useState<boolean>(false);
+  const [playingDraftStopped, setPlayingDraftStopped] = useState<boolean>(false);
 
   const [hasStarted, setHasStarted] = useState<boolean>(false);
   const [draftRecordings, setDraftRecordings] = useState<string[]>([]);
@@ -75,9 +75,8 @@ const HBRecordBar: React.FC<props> = ({
       setPlaying(false);
       setHasStarted(false);
       isNotPlayRecording();
+      setPlayingDraftStopped(true); 
       setIsPlayingDraft(false);
-      //audioPlayer.seekToPlayer(0)
-      // setCurrentPosition(0);
     }
   };
 
@@ -90,6 +89,8 @@ const HBRecordBar: React.FC<props> = ({
 
   const playDraftRecording = async (item: string, index: number) => {
     setDraftIndex(index);
+
+    setPlayingDraftStopped(false);
 
     if (isPlayingDraft) {
       setIsPlayingDraft(false);
@@ -121,15 +122,14 @@ const HBRecordBar: React.FC<props> = ({
               var dirSplit = recordDir.split("/");
 
               setHasRecording(dirSplit[dirSplit.length - 2], false);
-              
             }
           });
         }
       });
     }
     if (draftRecordings.length === 0) {
-      setAudioUri("")
-    } 
+      setAudioUri("");
+    }
   }, [draftRecordings]);
 
   const deleteDraftRecording = async (item: string) => {
@@ -152,7 +152,7 @@ const HBRecordBar: React.FC<props> = ({
     var highestNum = 0;
 
     files.map((item) => {
-      var itemSplit = item.split("_draftv");
+      var itemSplit = item.split("_" + t("draft", { lng: language }) + "v");
 
       var num = Number(itemSplit[itemSplit.length - 1].split(".")[0]);
       if (num > highestNum) {
@@ -161,7 +161,13 @@ const HBRecordBar: React.FC<props> = ({
     });
 
     var latestFile =
-      recordDir + t(translationStep, { lng: language }) + "_draftv" + highestNum + ".mp4";
+      recordDir +
+      t(translationStep, { lng: language }) +
+      "_" +
+      t("draft", { lng: language }) +
+      "v" +
+      highestNum +
+      ".mp4";
 
     setAudioUri(latestFile);
   };
@@ -176,7 +182,7 @@ const HBRecordBar: React.FC<props> = ({
     var highestNum = 0;
 
     files.map((item) => {
-      var itemSplit = item.split("_draftv");
+      var itemSplit = item.split("_" + t("draft", { lng: language }) + "v");
 
       var num = Number(itemSplit[itemSplit.length - 1].split(".")[0]);
       if (num > highestNum) {
@@ -187,7 +193,13 @@ const HBRecordBar: React.FC<props> = ({
     await createDirectory(recordDir);
 
     var destFile =
-      recordDir + t(translationStep, { lng: language }) + "_draftv" + (highestNum + 1) + ".mp4";
+      recordDir +
+      t(translationStep, { lng: language }) +
+      "_" +
+      t("draft", { lng: language }) +
+      "v" +
+      (highestNum + 1) +
+      ".mp4";
 
     await copyAndWriteFile(result, destFile, (name: string) => null);
 
@@ -309,12 +321,11 @@ const HBRecordBar: React.FC<props> = ({
                       key={index}
                       style={{
                         flexDirection: "row",
-                        justifyContent: "space-between",
-                        width: screenWidth - 100,
+                        justifyContent: "space-evenly",
+                        width: screenWidth - 125,
                         alignItems: "center",
                         borderWidth: 1,
                         borderColor: "#D3D3D3",
-                        padding: 20,
                       }}
                     >
                       <TouchableOpacity
@@ -323,7 +334,7 @@ const HBRecordBar: React.FC<props> = ({
                         <Icon
                           color="black"
                           source={
-                            isPlayingDraft && index === draftIndex
+                            (isPlayingDraft || !playingDraftStopped) && index === draftIndex
                               ? "stop"
                               : "play"
                           }
@@ -331,7 +342,7 @@ const HBRecordBar: React.FC<props> = ({
                         />
                       </TouchableOpacity>
 
-                      <Text style={{ fontSize: 15 }}>{item}</Text>
+                      <Text style={{ fontSize: 12 }}>{item}</Text>
 
                       <TouchableOpacity
                         onPress={() => deleteDraftRecording(item)}
