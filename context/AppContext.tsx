@@ -40,7 +40,7 @@ interface AppContextType {
   getPage: (pageNumber: number) => Promise<scripture>;
   getNumberOfPages: () => number;
   setHasRecording: (key: string, hasRecording: boolean) => void;
-  setPlayingDraft: (state:boolean) => void;
+  setPlayingDraft: (state: boolean) => void;
   isPlayingDraft: boolean;
   audioPlayer: AudioRecorderPlayer;
   language: string;
@@ -53,6 +53,17 @@ interface AppContextType {
   passageText: string;
   notes: any;
   title: string;
+  bookOverview: string;
+  bookNotes: any;
+  templateTitle: string;
+  passageOverview: string;
+  passageOverviewAV: [];
+  historicalContext: string;
+  historicalContextAV: [];
+  backgroundInfo: string;
+  backgroundInfoAV: [];
+  prominentThemes: string;
+  prominentThemesAV: [];
   templatePassages: any[];
   en_wordData: Map<string, WordNote>;
   fr_wordData: Map<string, WordNote>;
@@ -80,6 +91,18 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   const [count, setCount] = useState(0);
 
   const [translationStep, setTranslationStep] = useState<string>("");
+
+  const [bookOverview, setBookOverview] = useState<string>("");
+  const [bookNotes, setBookNotes] = useState<any[]>([]);
+  const [templateTitle, setTemplateTitle] = useState<string>("");
+  const [passageOverview, setPassageOverview] = useState<string>("");
+  const [passageOverviewAV, setPassageOverviewAV] = useState<[]>([]);
+  const [historicalContext, setHistoricalContext] = useState<string>("");
+  const [historicalContextAV, setHistoricalContextAV] = useState<[]>([]);
+  const [backgroundInfo, setBackgroundInfo] = useState<string>("");
+  const [backgroundInfoAV, setBackgroundInfoAV] = useState<[]>([]);
+  const [prominentThemes, setProminentThemes] = useState<string>("");
+  const [prominentThemesAV, setProminentThemesAV] = useState<[]>([]);
 
   const [audioURI, setAudioURI] = useState<string>("");
   const [imageURI, setImageURI] = useState<string>("");
@@ -287,9 +310,9 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
     );
   }
 
-  const setPlayingDraft = (state:boolean) => {
-    setIsPlayingDraft(state)
-  }
+  const setPlayingDraft = (state: boolean) => {
+    setIsPlayingDraft(state);
+  };
 
   function languageSwitcher(lng: string) {
     setLanguage(lng);
@@ -463,6 +486,18 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
 
       setTemplatePassages(retJSON.passages);
 
+      setBookOverview(retJSON.learn.book.overview);
+      setBookNotes(retJSON.learn.book.notes);
+      setTemplateTitle(retJSON.learn.title);
+      setPassageOverview(retJSON.learn.passageOverview.text);
+      setPassageOverviewAV(retJSON.learn.passageOverview.av);
+      setHistoricalContext(retJSON.learn.historicalContext.text);
+      setHistoricalContextAV(retJSON.learn.historicalContext.av);
+      setBackgroundInfo(retJSON.learn.backgroundInfo.text);
+      setBackgroundInfoAV(retJSON.learn.backgroundInfo.av);
+      setProminentThemes(retJSON.learn.prominentThemes.text);
+      setProminentThemesAV(retJSON.learn.prominentThemes.av);
+
       return retJSON;
     } catch (error) {
       console.error("Error reading file:", error);
@@ -544,6 +579,17 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         passageText,
         title,
         notes,
+        bookOverview,
+        bookNotes,
+        templateTitle,
+        passageOverview,
+        passageOverviewAV,
+        historicalContext,
+        historicalContextAV,
+        backgroundInfo,
+        backgroundInfoAV,
+        prominentThemes,
+        prominentThemesAV,
         templatePassages,
         audioStop,
         template,

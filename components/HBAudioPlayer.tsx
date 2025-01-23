@@ -6,11 +6,15 @@ import { useAppContext } from "@/context/AppContext";
 
 import { PlayBackType } from "react-native-audio-recorder-player";
 
+import RNFS from "react-native-fs";
+import getMP3Duration from "react-native-get-mp3-duration";
+
 interface AudioPlayerProps {
-  audioUri: string;
+  audioUri: string[];
+  progressCallBack?: (status: string, index: number) => void
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri, progressCallBack }) => {
   const { audioPlayer, enableAudio, disableAudio, audioStop, playRecording } =
     useAppContext();
 
@@ -27,8 +31,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
 
   const [currentPosition, setCurrentPosition] = useState(0);
   const [duration, setDuration] = useState(0);
+
   const [playing, setPlaying] = useState<boolean>(false);
   const [audioLoaded, setAudioLoaded] = useState<boolean>(false);
+  var currentAudioIndex: number = 0;
+  var progress: number = 0;
 
   const handleSliderValueChange = async (value: number) => {
     if (audioLoaded) {
@@ -37,23 +44,50 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
     }
   };
 
+  const playNextAudio = async () => {
+    currentAudioIndex++;
+    if (currentAudioIndex < audioUri.length) {
+      audioPlayer.stopPlayer().then(() => {
+        audioPlayer.startPlayer(audioUri[currentAudioIndex]);
+      });
+
+      progressCallBack ? progressCallBack("inProgress",currentAudioIndex) : ""
+
+
+    } else {
+      setAudioLoaded(false);
+      setPlaying(false);
+      setCurrentPosition(0);
+      
+      progressCallBack ? progressCallBack("finished",currentAudioIndex) : ""
+
+    }
+  };
+
   const onPlaybackStatusUpdate = (status: PlayBackType) => {
     if (playRecording) {
       return;
     }
 
-    setDuration(status.duration || 0);
-    setCurrentPosition(status.currentPosition || 0);
+    // setDuration(status.duration || 0);
+    setCurrentPosition(status.currentPosition + progress || 0);
 
     if (status.isFinished) {
-      setAudioLoaded(false);
-      setPlaying(false);
-      setCurrentPosition(0);
+      progress = progress + status.currentPosition;
+      playNextAudio();
     }
   };
 
   const onStartPlay = async () => {
-    await disableAudio();
+    audioUri.map((audio) => {
+      RNFS.readFile(audio, "base64").then((base64) =>
+        getMP3Duration(base64).then((duration) =>
+          setDuration((prev) => prev + duration)
+        )
+      );
+    });
+
+    disableAudio();
     enableAudio();
     setPlaying(true);
     setAudioLoaded(true);
@@ -62,7 +96,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri }) => {
       audioPlayer.addPlayBackListener((status) => {
         onPlaybackStatusUpdate(status);
       });
-      audioPlayer.startPlayer(audioUri);
+      audioPlayer.startPlayer(audioUri[currentAudioIndex]);
     }, 5); // 1000 milliseconds = 1 second
   };
 

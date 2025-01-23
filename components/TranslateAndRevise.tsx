@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ActivityIndicator } from "react-native-paper";
 import { useState } from "react";
 import { Portal, Modal } from "react-native-paper";
+import getAppBarProps from "@/helpers/GetAppBarProps";
 
 import { View, StyleSheet } from "react-native";
 
@@ -34,6 +35,8 @@ const TranslateAndRevise: React.FC<scripture> = ({
     setIsLoading(loading);
   };
 
+  const appbarProps=getAppBarProps("translate")
+
   const {translationStep, template, setHasRecording} = useAppContext()
 
    const recordDir =
@@ -56,7 +59,7 @@ const TranslateAndRevise: React.FC<scripture> = ({
           },
         ]}
       >
-        <HBAppBar />
+        <HBAppBar {...appbarProps} />
         <HBScriptureCard
           imageURI={imageURI}
           passageText={passageText}

@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   chapters: {
-    width: 180, // Adjust the width as needed
+    width: 175, // Adjust the width as needed
     height: 120, // Adjust the height as needed
     margin: 2,
     borderRadius: 10,

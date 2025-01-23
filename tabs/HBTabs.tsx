@@ -11,18 +11,11 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 import { Ionicons } from "@expo/vector-icons";
-import {
-  MD3LightTheme as DefaultTheme,
-  PaperProvider,
-} from "react-native-paper";
-
-import { useLocalSearchParams } from 'expo-router';
+import { MD3LightTheme as DefaultTheme } from "react-native-paper";
 
 import { useTranslation } from "react-i18next";
 
 import { useAppContext } from "@/context/AppContext";
-import { useState } from "react";
-import { useNavigation } from "expo-router";
 
 const TemplateTab: React.FC = () => {
   const theme = {
@@ -35,14 +28,11 @@ const TemplateTab: React.FC = () => {
     },
   };
 
-  const {navigate} = useNavigation()
-
   const { t } = useTranslation();
 
   const colorScheme = useColorScheme();
 
   const { language, passageText } = useAppContext();
-
 
   return (
     <Tabs
@@ -125,10 +115,19 @@ const TemplateTab: React.FC = () => {
 
       <Tabs.Screen
         name="HelpHTMLViewer"
-        
         options={{
           href: null,
-          title: t("Words", { lng: language }),
+          title: t("Help", { lng: language }),
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="settings" size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Learn"
+        options={{
+          href: null,
+          title: t("Learn", { lng: language }),
           tabBarIcon: ({ color }) => (
             <Ionicons name="settings" size={28} color={color} />
           ),

@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   books: {
-    width: 120, // Adjust the width as needed
-    height: 80, // Adjust the height as needed
+    width: 175, // Adjust the width as needed
+    height: 120, // Adjust the height as needed
     margin: 2,
     borderRadius: 10,
   },
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     wordWrap: "2",
   },
   bookTitle: {
-    fontSize: 10,
+    fontSize: 18,
     fontWeight: "bold",
   },
 });

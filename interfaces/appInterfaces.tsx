@@ -19,3 +19,10 @@ export interface scripture {
     tranlationStep: string;
     language: string;
   }
+
+  export interface workflow {
+    title: string,
+    color: string,
+    icon: string,
+    helpfile: string,
+  }

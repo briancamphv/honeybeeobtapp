@@ -1,25 +1,34 @@
 import * as React from "react";
+import { useState } from "react";
+import { workflow } from "@/interfaces/appInterfaces";
 
-import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 
 import HTMLViewer from "./HTMLViewer";
 
-import { List, Dialog, Portal, Button, Text, Icon } from "react-native-paper";
+import { List, Portal, Icon } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 import { useAppContext } from "@/context/AppContext";
 import navigateWithParams from "@/helpers/NavigateHelper";
-import { navigateToScreen } from "@/helpers/NavigateHelper";
+import {
+  WorkFlowColors,
+  WorkFlowIcons,
+  WorkFlowTitles,
+  WorkFlowDestinations,
+} from "@/helpers/Enumerators";
 
 type htmlHelpRouteParams = {
   helpFile: string;
 };
 
-const HBAppBar: React.FC = () => {
+const HBAppBar: React.FC<workflow> = ({ title, color, helpfile, icon }) => {
   const navigation = useNavigation();
+  const [expanded, setExpanded] = React.useState<boolean>(false);
 
   const onNavigate = (dest: string) => {
+    setExpanded(!expanded);
     navigation.dispatch(DrawerActions.jumpTo(dest));
   };
 
@@ -33,16 +42,13 @@ const HBAppBar: React.FC = () => {
 
   const openHelpDialog = () => handleNavigate();
 
-  // navigateToScreen(navigation,"HelpHTMLViewer")
-
-  //const openHelpDialog = () => setHelpDialogVisible(true);
   const closeHelpDialog = () => setHelpDialogVisible(false);
 
   const { language } = useAppContext();
   const { t } = useTranslation();
 
   const WorkFlowMenu = () => {
-    const [expanded, setExpanded] = React.useState<boolean>(false);
+  
 
     const _handlePress = () => {
       setExpanded(!expanded);
@@ -52,11 +58,9 @@ const HBAppBar: React.FC = () => {
       <View style={styles.workflow}>
         <List.Section>
           <List.Accordion
-            theme={{ colors: { background: "red" } }}
-            left={(props) => (
-              <List.Icon {...props} color="white" icon="microphone" />
-            )}
-            title={t("Translate + Revise", { lng: language })}
+            theme={{ colors: { background: color } }}
+            left={(props) => <List.Icon {...props} color="white" icon={icon} />}
+            title={t(title, { lng: language })}
             titleStyle={{
               color: "white",
               fontSize: 20,
@@ -70,32 +74,126 @@ const HBAppBar: React.FC = () => {
               />
             )}
             onPress={_handlePress}
+            expanded={expanded}
           >
             <List.Item
-              style={{ backgroundColor: "green" }}
+              style={{ backgroundColor: WorkFlowColors.learn }}
               titleStyle={{
                 color: "white",
                 fontSize: 20,
                 fontWeight: "condensedBold",
               }}
               left={(props) => (
-                <List.Icon {...props} color="white" icon="account-multiple" />
+                <List.Icon
+                  {...props}
+                  color="white"
+                  icon={WorkFlowIcons.learn}
+                />
               )}
-              title={t("Community Work", { lng: language })}
-              onPress={() => onNavigate("Templates")}
+              title={t(WorkFlowTitles.learn, { lng: language })}
+              onPress={() => onNavigate(WorkFlowDestinations.learn)}
+            />
+             <List.Item
+              style={{ backgroundColor: WorkFlowColors.translate }}
+              titleStyle={{
+                color: "white",
+                fontSize: 20,
+                fontWeight: "condensedBold",
+              }}
+              left={(props) => (
+                <List.Icon
+                  {...props}
+                  color="white"
+                  icon={WorkFlowIcons.translate}
+                />
+              )}
+              title={t(WorkFlowTitles.translate, { lng: language })}
+              onPress={() => onNavigate(WorkFlowDestinations.translate)}
             />
             <List.Item
-              style={{ backgroundColor: "blue" }}
+              style={{ backgroundColor: WorkFlowColors.naturalness }}
               titleStyle={{
                 color: "white",
                 fontSize: 20,
                 fontWeight: "condensedBold",
               }}
               left={(props) => (
-                <List.Icon {...props} color="white" icon="bullseye-arrow" />
+                <List.Icon
+                  {...props}
+                  color="white"
+                  icon={WorkFlowIcons.naturalness}
+                />
               )}
-              title={t("Accuracy Check", { lng: language })}
-              onPress={() => onNavigate("Templates")}
+              title={t(WorkFlowTitles.naturalness, { lng: language })}
+              onPress={() => onNavigate(WorkFlowDestinations.naturalness)}
+            />
+            <List.Item
+              style={{ backgroundColor: WorkFlowColors.accuracy }}
+              titleStyle={{
+                color: "white",
+                fontSize: 20,
+                fontWeight: "condensedBold",
+              }}
+              left={(props) => (
+                <List.Icon
+                  {...props}
+                  color="white"
+                  icon={WorkFlowIcons.accuracy}
+                />
+              )}
+              title={t(WorkFlowTitles.accuracy, { lng: language })}
+              onPress={() => onNavigate(WorkFlowDestinations.accuracy)}
+            />
+            <List.Item
+              style={{ backgroundColor: WorkFlowColors.voice }}
+              titleStyle={{
+                color: "white",
+                fontSize: 20,
+                fontWeight: "condensedBold",
+              }}
+              left={(props) => (
+                <List.Icon
+                  {...props}
+                  color="white"
+                  icon={WorkFlowIcons.voice}
+                />
+              )}
+              title={t(WorkFlowTitles.voice, { lng: language })}
+              onPress={() => onNavigate(WorkFlowDestinations.voice)}
+            />
+            <List.Item
+              style={{ backgroundColor: WorkFlowColors.finalize }}
+              titleStyle={{
+                color: "white",
+                fontSize: 20,
+                fontWeight: "condensedBold",
+              }}
+              left={(props) => (
+                <List.Icon
+                  {...props}
+                  color="white"
+                  icon={WorkFlowIcons.finalize}
+                />
+              )}
+              title={t(WorkFlowTitles.finalize, { lng: language })}
+              onPress={() => onNavigate(WorkFlowDestinations.finalize)}
+            />
+            <List.Item
+              style={{ backgroundColor: WorkFlowColors.review }}
+              titleStyle={{
+                color: "white",
+                fontSize: 20,
+                fontWeight: "condensedBold",
+              }}
+              left={(props) => (
+                <List.Icon
+                  {...props}
+                  color="white"
+                  icon={WorkFlowIcons.review}
+                />
+              )}
+              title={t(WorkFlowTitles.review, { lng: language })}
+              onPress={() => onNavigate(WorkFlowDestinations.review)}
             />
           </List.Accordion>
         </List.Section>
@@ -105,7 +203,7 @@ const HBAppBar: React.FC = () => {
 
   return (
     <>
-      <View style={styles.title}>
+      <View style={[styles.title, { backgroundColor: color }]}>
         <WorkFlowMenu />
         <TouchableOpacity style={{ paddingRight: 20 }} onPress={openHelpDialog}>
           <Icon color="white" source="help" size={25} />
@@ -114,24 +212,10 @@ const HBAppBar: React.FC = () => {
 
       <Portal>
         {helpDialogVisible ? (
-          <HTMLViewer helpFile={"translate"} closeDialog={closeHelpDialog} />
+          <HTMLViewer helpFile={helpfile} closeDialog={closeHelpDialog} />
         ) : (
           ""
         )}
-        {/* <Dialog
-          visible={helpDialogVisible}
-          onDismiss={closeHelpDialog}
-          style={{ flex: 1 }}
-        >
-          <Dialog.Title>{t("Help", { lng: language })}</Dialog.Title>
-      
-
-          <Dialog.Actions>
-            <Button onPress={closeHelpDialog}>
-              {t("Close", { lng: language })}
-            </Button>
-          </Dialog.Actions>
-        </Dialog> */}
       </Portal>
     </>
   );
@@ -139,7 +223,6 @@ const HBAppBar: React.FC = () => {
 
 const styles = StyleSheet.create({
   title: {
-    backgroundColor: "red",
     marginBottom: 5,
     flexDirection: "row",
     alignItems: "baseline",
@@ -152,32 +235,3 @@ const styles = StyleSheet.create({
 });
 
 export default HBAppBar;
-
-{
-  /* <Appbar.Header elevated={true} style={styles.title}>
-<Appbar.Action color="white" icon="menu" onPress={openDrawer} />
-
-<Appbar.Content
-  title={
-    <React.Fragment>
-      <View>
-        {/* <Icon color="white" source="microphone" size={25} />
-        <Text
-          style={{
-            marginLeft: 8,
-            fontSize: 20,
-            fontWeight: "600",
-            color: "white",
-          }}
-        >
-          {t("Translate + Revise")}
-        </Text> 
-        <WorkFlowMenu />
-      </View>
-    </React.Fragment>
-  }
-></Appbar.Content>
-
-<Appbar.Action color="white" icon="help" onPress={openHelpDialog} />
-</Appbar.Header> */
-}

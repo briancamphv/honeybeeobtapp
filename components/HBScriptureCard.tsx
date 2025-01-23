@@ -7,6 +7,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import WordDialog from "./WordDialog";
 import { WordNote } from "@/interfaces/appInterfaces";
 
+
+
 import {
   createDirectory,
   copyAndWriteFile,
@@ -24,7 +26,6 @@ import {
   Text,
   Dialog,
   Portal,
-  Modal,
   IconButton,
 } from "react-native-paper";
 import { useTranslation } from "react-i18next";
@@ -551,7 +552,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
           )} */}
             </View>
 
-            <AudioPlayer audioUri={audioURI} />
+            <AudioPlayer audioUri={[audioURI]} />
             <Card.Content>
               <View>
                 <Text variant="titleLarge">{title}</Text>
@@ -646,10 +647,10 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
               checkFileType(exegeticalDialogNote.av) === "audio" ? (
                 <AudioPlayer
                   audioUri={
-                    FileSystem.documentDirectory +
+                    [FileSystem.documentDirectory +
                     template +
                     "/audioVisual/" +
-                    exegeticalDialogNote.av
+                    exegeticalDialogNote.av]
                   }
                 />
               ) : (

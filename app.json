@@ -11,14 +11,14 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.briancamphv.HoneyBeeOBTApp",
-      "buildNumber": "4"
+      "buildNumber": "5"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 16,
+      "versionCode": 17,
       "package": "com.briancamphv.HoneyBeeOBTApp",
       "permissions": [
         "android.permission.RECORD_AUDIO",
