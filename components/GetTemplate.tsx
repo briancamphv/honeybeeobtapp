@@ -10,6 +10,7 @@ import { useAppContext } from "@/context/AppContext";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 import ChaptersOfBible from "@/app/data/ChaptersOfBible";
+import { WorkFlowDestinations } from "@/helpers/Enumerators";
 
 import {
   copyAndWriteFile,
@@ -91,7 +92,7 @@ const GetTemplate: React.FC<GetTemplate> = ({
         } else {
           setStep("Translate");
           loadTemplate(template).then(() => {
-            navigation.dispatch(DrawerActions.jumpTo("ScripturePager"));
+            navigation.dispatch(DrawerActions.jumpTo(WorkFlowDestinations.translate));
           });
           setAreBooksVisible(true);
           setAreChaptersVisible(false);

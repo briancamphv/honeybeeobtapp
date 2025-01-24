@@ -24,7 +24,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUri, progressCallBack })
       setAudioLoaded(false);
       setPlaying(false);
       setCurrentPosition(0);
-
+      setDuration(0);
       enableAudio();
     }
   }, [audioStop]);

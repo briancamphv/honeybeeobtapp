@@ -150,7 +150,7 @@ const HBRecordBar: React.FC<props> = ({
     var highestNum = 0;
 
     files.map((item) => {
-      var itemSplit = item.split("_" + t("draft", { lng: language }) + "v");
+      var itemSplit = item.split("_" + t("draft", { lng: language }));
 
       var num = Number(itemSplit[itemSplit.length - 1].split(".")[0]);
       if (num > highestNum) {
@@ -163,7 +163,6 @@ const HBRecordBar: React.FC<props> = ({
       t(translationStep, { lng: language }) +
       "_" +
       t("draft", { lng: language }) +
-      "v" +
       highestNum +
       ".mp4";
 
@@ -180,7 +179,7 @@ const HBRecordBar: React.FC<props> = ({
     var highestNum = 0;
 
     files.map((item) => {
-      var itemSplit = item.split("_" + t("draft", { lng: language }) + "v");
+      var itemSplit = item.split("_" + t("draft", { lng: language }));
 
       var num = Number(itemSplit[itemSplit.length - 1].split(".")[0]);
       if (num > highestNum) {
@@ -195,7 +194,6 @@ const HBRecordBar: React.FC<props> = ({
       t(translationStep, { lng: language }) +
       "_" +
       t("draft", { lng: language }) +
-      "v" +
       (highestNum + 1) +
       ".mp4";
 

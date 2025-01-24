@@ -38,7 +38,7 @@ import stripWordsofSpecialCharacters, {
   stripWordsofTokens,
 } from "@/helpers/StringFunctions";
 
-import HBRecordBar from "./HBRecordBar";
+
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("screen");
 

@@ -6,6 +6,12 @@ export interface scripture {
     notes: any;
   }
 
+  export interface section {
+    title: string;
+    BEN: string;
+    passages: any[];
+  }
+
  export interface WordNote {
     altFormSym: string;
     otherLangEx: string;

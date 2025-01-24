@@ -15,7 +15,7 @@ import HBScriptureCard from "@/components/HBScriptureCard";
 
 import HBRecordBar from "@/components/HBRecordBar";
 
-import { scripture } from "../interfaces/appInterfaces";
+import { scripture } from "@/interfaces/appInterfaces";
 import { useAppContext } from "@/context/AppContext";
 import * as FileSystem from "expo-file-system";
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";

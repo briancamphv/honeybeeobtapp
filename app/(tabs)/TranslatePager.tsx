@@ -2,11 +2,11 @@ import React from "react";
 import { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, Touchable } from "react-native";
 import PagerView from "react-native-pager-view";
-import TranslateAndRevise from "../../components/TranslateAndRevise";
+import TranslateAndRevise from "../screens/TranslateAndRevise";
 import { useAppContext } from "@/context/AppContext";
 import { scripture } from "../../interfaces/appInterfaces";
 
-const ScripturePager = () => {
+const TranslatePager = () => {
   const {
     getPage,
     getNumberOfPages,
@@ -111,4 +111,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScripturePager;
+export default TranslatePager;

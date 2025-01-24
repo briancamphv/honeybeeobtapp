@@ -44,12 +44,10 @@ const HBAppBar: React.FC<workflow> = ({ title, color, helpfile, icon }) => {
 
   const closeHelpDialog = () => setHelpDialogVisible(false);
 
-  const { language } = useAppContext();
+  const { language, setStep, disableAudio } = useAppContext();
   const { t } = useTranslation();
 
   const WorkFlowMenu = () => {
-  
-
     const _handlePress = () => {
       setExpanded(!expanded);
     };
@@ -91,9 +89,13 @@ const HBAppBar: React.FC<workflow> = ({ title, color, helpfile, icon }) => {
                 />
               )}
               title={t(WorkFlowTitles.learn, { lng: language })}
-              onPress={() => onNavigate(WorkFlowDestinations.learn)}
+              onPress={() => {
+                disableAudio()
+                setStep("learn");
+                onNavigate(WorkFlowDestinations.learn);
+              }}
             />
-             <List.Item
+            <List.Item
               style={{ backgroundColor: WorkFlowColors.translate }}
               titleStyle={{
                 color: "white",
@@ -108,7 +110,11 @@ const HBAppBar: React.FC<workflow> = ({ title, color, helpfile, icon }) => {
                 />
               )}
               title={t(WorkFlowTitles.translate, { lng: language })}
-              onPress={() => onNavigate(WorkFlowDestinations.translate)}
+              onPress={() => {
+                disableAudio()
+                setStep("translate");
+                onNavigate(WorkFlowDestinations.translate);
+              }}
             />
             <List.Item
               style={{ backgroundColor: WorkFlowColors.naturalness }}
@@ -125,7 +131,11 @@ const HBAppBar: React.FC<workflow> = ({ title, color, helpfile, icon }) => {
                 />
               )}
               title={t(WorkFlowTitles.naturalness, { lng: language })}
-              onPress={() => onNavigate(WorkFlowDestinations.naturalness)}
+              onPress={() => {
+                disableAudio()
+                setStep("naturalness");
+                onNavigate(WorkFlowDestinations.naturalness);
+              }}
             />
             <List.Item
               style={{ backgroundColor: WorkFlowColors.accuracy }}
@@ -142,7 +152,11 @@ const HBAppBar: React.FC<workflow> = ({ title, color, helpfile, icon }) => {
                 />
               )}
               title={t(WorkFlowTitles.accuracy, { lng: language })}
-              onPress={() => onNavigate(WorkFlowDestinations.accuracy)}
+              onPress={() => {
+                disableAudio()
+                setStep("accuracy");
+                onNavigate(WorkFlowDestinations.accuracy);
+              }}
             />
             <List.Item
               style={{ backgroundColor: WorkFlowColors.voice }}
@@ -159,7 +173,11 @@ const HBAppBar: React.FC<workflow> = ({ title, color, helpfile, icon }) => {
                 />
               )}
               title={t(WorkFlowTitles.voice, { lng: language })}
-              onPress={() => onNavigate(WorkFlowDestinations.voice)}
+              onPress={() => {
+                disableAudio()
+                setStep("voice");
+                onNavigate(WorkFlowDestinations.voice);
+              }}
             />
             <List.Item
               style={{ backgroundColor: WorkFlowColors.finalize }}
@@ -176,7 +194,11 @@ const HBAppBar: React.FC<workflow> = ({ title, color, helpfile, icon }) => {
                 />
               )}
               title={t(WorkFlowTitles.finalize, { lng: language })}
-              onPress={() => onNavigate(WorkFlowDestinations.finalize)}
+              onPress={() => {
+                disableAudio()
+                setStep("finalize");
+                onNavigate(WorkFlowDestinations.finalize);
+              }}
             />
             <List.Item
               style={{ backgroundColor: WorkFlowColors.review }}
@@ -193,7 +215,11 @@ const HBAppBar: React.FC<workflow> = ({ title, color, helpfile, icon }) => {
                 />
               )}
               title={t(WorkFlowTitles.review, { lng: language })}
-              onPress={() => onNavigate(WorkFlowDestinations.review)}
+              onPress={() => {
+                disableAudio()
+                setStep("review");
+                onNavigate(WorkFlowDestinations.review);
+              }}
             />
           </List.Accordion>
         </List.Section>

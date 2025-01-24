@@ -17,6 +17,7 @@ import { useAppContext } from "@/context/AppContext";
 import { DrawerActions } from "@react-navigation/native";
 import { Alert } from "react-native";
 import { useTheme } from "react-native-paper";
+import { WorkFlowDestinations } from "@/helpers/Enumerators";
 
 interface ChapterCards {
   book: string;
@@ -73,7 +74,7 @@ const ChapterCards: React.FC<ChapterCards> = ({
 
     setStep("translate");
     loadTemplate(item).then(() => {
-      navigation.dispatch(DrawerActions.jumpTo("ScripturePager"));
+      navigation.dispatch(DrawerActions.jumpTo(WorkFlowDestinations.translate));
       setAreChaptersVisible(false);
       setAreBooksVisible(true);
     });

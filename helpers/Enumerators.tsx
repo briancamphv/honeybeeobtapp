@@ -35,8 +35,8 @@ export enum WorkFlowTitles {
 }
 
 export enum WorkFlowDestinations {
-  learn = "Learn",
-  translate = "ScripturePager",
+  learn = "LearnPager",
+  translate = "TranslatePager",
   naturalness = "Naturalness",
   accuracy = "Accuracy",
   voice = "VoiceStudio",

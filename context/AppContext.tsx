@@ -7,7 +7,6 @@ import {
   createFileFromJSON,
 } from "@/helpers/FileUtilies";
 import stripWordsofSpecialCharacters from "@/helpers/StringFunctions";
-import { scripture } from "@/interfaces/appInterfaces";
 import AudioRecorderPlayer, {
   PlayBackType,
 } from "react-native-audio-recorder-player";
@@ -15,7 +14,7 @@ import AudioRecorderPlayer, {
 import { listFiles } from "@/helpers/FileUtilies";
 import { WordNote } from "@/interfaces/appInterfaces";
 
-import { appState } from "@/interfaces/appInterfaces";
+import { appState, section, scripture } from "@/interfaces/appInterfaces";
 
 const audioPlayer = new AudioRecorderPlayer();
 
@@ -39,8 +38,10 @@ interface AppContextType {
   revertImage: () => void;
   getPage: (pageNumber: number) => Promise<scripture>;
   getNumberOfPages: () => number;
+  getNumberOfSections: () => number;
   setHasRecording: (key: string, hasRecording: boolean) => void;
   setPlayingDraft: (state: boolean) => void;
+  getSection(sectionNumber: number): section;
   isPlayingDraft: boolean;
   audioPlayer: AudioRecorderPlayer;
   language: string;
@@ -118,6 +119,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   const [playRecording, setPlayRecording] = useState<boolean>(false);
 
   const [templateJSON, setTemplateJSON] = useState<any>({});
+  const [templateJSONPassages, setTemplateJSONPassages] = useState<any>({});
   const [templatePassages, setTemplatePassages] = useState<any>([]);
 
   const [en_wordData, setEN_WordData] = useState<Map<string, WordNote>>(
@@ -227,15 +229,15 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
       FileSystem.documentDirectory +
         template +
         "/audioVisual/" +
-        templateJSON.passages[pageNumber].audio
+        templateJSONPassages[pageNumber].audio
     );
 
     var currentTitle =
-      templateJSON.passages[pageNumber].book +
+      templateJSONPassages[pageNumber].book +
       " " +
-      templateJSON.passages[pageNumber].chapter +
+      templateJSONPassages[pageNumber].chapter +
       ": " +
-      templateJSON.passages[pageNumber].verses;
+      templateJSONPassages[pageNumber].verses;
 
     fileExists(
       FileSystem.documentDirectory! +
@@ -257,19 +259,19 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
           FileSystem.documentDirectory +
             template +
             "/audioVisual/" +
-            templateJSON.passages[pageNumber].image
+            templateJSONPassages[pageNumber].image
         );
       }
     });
 
-    setPassageText(templateJSON.passages[pageNumber].text);
-    setNotes(templateJSON.passages[pageNumber].notes);
+    setPassageText(templateJSONPassages[pageNumber].text);
+    setNotes(templateJSONPassages[pageNumber].notes);
     setTitle(
-      templateJSON.passages[pageNumber].book +
+      templateJSONPassages[pageNumber].book +
         " " +
-        templateJSON.passages[pageNumber].chapter +
+        templateJSONPassages[pageNumber].chapter +
         ": " +
-        templateJSON.passages[pageNumber].verses
+        templateJSONPassages[pageNumber].verses
     );
   }, [pageNumber]); // Empty dependency array
 
@@ -306,7 +308,7 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
       FileSystem.documentDirectory +
         template +
         "/audioVisual/" +
-        templateJSON.passages[pageNumber].image
+        templateJSONPassages[pageNumber].image
     );
   }
 
@@ -358,7 +360,20 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   }
 
   function getNumberOfPages(): number {
-    return templateJSON.passages.length;
+    return templateJSONPassages.length;
+  }
+
+  function getNumberOfSections(): number {
+    return templateJSON.sections.length;
+  }
+
+  function getSection(sectionNumber: number): section {
+   
+    return {
+      title: templateJSON.sections[sectionNumber].section.title,
+      BEN: templateJSON.sections[sectionNumber].section.BEN,
+      passages: templateJSON.sections[sectionNumber].section.passages,
+    };
   }
 
   async function getPage(pageNumber: number): Promise<scripture> {
@@ -366,14 +381,14 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
       FileSystem.documentDirectory +
       template +
       "/audioVisual/" +
-      templateJSON.passages[pageNumber].audio;
+      templateJSONPassages[pageNumber].audio;
 
     var currentTitle =
-      templateJSON.passages[pageNumber].book +
+      templateJSONPassages[pageNumber].book +
       " " +
-      templateJSON.passages[pageNumber].chapter +
+      templateJSONPassages[pageNumber].chapter +
       ": " +
-      templateJSON.passages[pageNumber].verses;
+      templateJSONPassages[pageNumber].verses;
 
     var imageURI = "";
     var imgFileExist = await fileExists(
@@ -396,17 +411,17 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         FileSystem.documentDirectory +
         template +
         "/audioVisual/" +
-        templateJSON.passages[pageNumber].image;
+        templateJSONPassages[pageNumber].image;
     }
 
-    var passageText = templateJSON.passages[pageNumber].text;
-    var notes = templateJSON.passages[pageNumber].notes;
+    var passageText = templateJSONPassages[pageNumber].text;
+    var notes = templateJSONPassages[pageNumber].notes;
     var title =
-      templateJSON.passages[pageNumber].book +
+      templateJSONPassages[pageNumber].book +
       " " +
-      templateJSON.passages[pageNumber].chapter +
+      templateJSONPassages[pageNumber].chapter +
       ": " +
-      templateJSON.passages[pageNumber].verses;
+      templateJSONPassages[pageNumber].verses;
 
     return {
       imageURI: imageURI,
@@ -420,6 +435,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
   async function loadTemplate(template: string): Promise<any> {
     var jsonData = "";
 
+    var passageArray: any[] = [];
+
     setTemplate(template);
 
     try {
@@ -432,22 +449,32 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         "_text.json";
       const jsonData = await FileSystem.readAsStringAsync(fileUri);
       const retJSON = JSON.parse(jsonData);
+      setTemplateJSON(retJSON)
 
-      setTemplateJSON(retJSON);
+      //build passage array
+
+      retJSON.sections.map((item: any, index:number) => {
+       
+        passageArray = [...passageArray,...item.section.passages]
+        
+      });
+
+      setTemplateJSONPassages(passageArray);
+   
 
       setAudioURI(
         FileSystem.documentDirectory +
           template +
           "/audioVisual/" +
-          retJSON.passages[pageNumber].audio
+          passageArray[pageNumber].audio
       );
 
       var currentTitle =
-        retJSON.passages[pageNumber].book +
+        passageArray[pageNumber].book +
         " " +
-        retJSON.passages[pageNumber].chapter +
+        passageArray[pageNumber].chapter +
         ": " +
-        retJSON.passages[pageNumber].verses;
+        passageArray[pageNumber].verses;
 
       fileExists(
         FileSystem.documentDirectory! +
@@ -469,22 +496,22 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
             FileSystem.documentDirectory +
               template +
               "/audioVisual/" +
-              retJSON.passages[pageNumber].image
+              passageArray[pageNumber].image
           );
         }
       });
 
-      setPassageText(retJSON.passages[pageNumber].text);
-      setNotes(retJSON.passages[pageNumber].notes);
+      setPassageText(passageArray[pageNumber].text);
+      setNotes(passageArray[pageNumber].notes);
       setTitle(
-        retJSON.passages[pageNumber].book +
+        passageArray[pageNumber].book +
           " " +
-          retJSON.passages[pageNumber].chapter +
+          passageArray[pageNumber].chapter +
           ": " +
-          retJSON.passages[pageNumber].verses
+          passageArray[pageNumber].verses
       );
 
-      setTemplatePassages(retJSON.passages);
+      setTemplatePassages(passageArray);
 
       setBookOverview(retJSON.learn.book.overview);
       setBookNotes(retJSON.learn.book.notes);
@@ -619,6 +646,8 @@ const AppProvider: React.FC<{ children: React.ReactElement }> = ({
         decrementPageNumber,
         isPlayRecording,
         isNotPlayRecording,
+        getNumberOfSections,
+        getSection,
       }}
     >
       {children}

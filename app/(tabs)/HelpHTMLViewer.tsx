@@ -12,6 +12,7 @@ import { useNavigation } from "expo-router";
 import { Help } from "@/helpers/Enumerators";
 import { navigateToScreen } from "@/helpers/NavigateHelper";
 import { useLocalSearchParams } from "expo-router";
+import { WorkFlowDestinations } from "@/helpers/Enumerators";
 
 const HelpHTMLViewer: React.FC = () => {
 
@@ -96,7 +97,7 @@ const HelpHTMLViewer: React.FC = () => {
             icon="close-thick"
             size={32}
             onPress={() => {
-              navigateToScreen(navigation, "ScripturePager");
+              navigateToScreen(navigation, WorkFlowDestinations.translate);
             }}
           />
         </View>
