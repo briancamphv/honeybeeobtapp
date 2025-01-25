@@ -5,7 +5,10 @@ import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import WordDialog from "./WordDialog";
+import PhraseDialog from "./PhraseDialog";
 import { WordNote } from "@/interfaces/appInterfaces";
+import buildPassage from "@/helpers/BuildPassage";
+import { ExegeticalNote } from "@/interfaces/appInterfaces";
 
 
 
@@ -16,7 +19,7 @@ import {
   fileExists,
 } from "@/helpers/FileUtilies";
 
-import checkFileType from "@/helpers/FileTypeCheck";
+
 
 import { Alert } from "react-native";
 import { StyleSheet, View, Dimensions, ScrollView, Image } from "react-native";
@@ -24,14 +27,11 @@ import { StyleSheet, View, Dimensions, ScrollView, Image } from "react-native";
 import {
   Card,
   Text,
-  Dialog,
-  Portal,
-  IconButton,
 } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { useAppContext } from "@/context/AppContext";
 
-import AutosizeImage from "@/helpers/AutoSizeImage";
+
 import AudioPlayer from "./HBAudioPlayer";
 
 import stripWordsofSpecialCharacters, {
@@ -51,13 +51,7 @@ interface HBScriptureCard {
   setLoading: (loading: boolean) => void;
 }
 
-interface HBScriptureNote {
-  words: string;
-  BEN: string;
-  parallelRef: string;
-  comment: string;
-  av: string;
-}
+
 
 interface italics {
   index: number;
@@ -84,7 +78,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
   const [exegeticalDialogVisible, setExegeticalDialogVisible] = useState(false);
   const [wordDialogVisible, setWordDialogVisible] = useState(false);
   const [exegeticalDialogNote, setExegeticalDialogNote] =
-    useState<HBScriptureNote>({
+    useState<ExegeticalNote>({
       words: "",
       BEN: "",
       parallelRef: "",
@@ -305,7 +299,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
       { cancelable: false } // Prevents dismissing the alert by tapping outside
     );
   };
-  const textElements: React.JSX.Element[] = [];
+  var textElements: React.JSX.Element[] = [];
 
   const superScriptNumbers = (
     word: string,
@@ -384,7 +378,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     });
   };
 
-  const buildScripturePassage = () => {
+  const buildScripturePassagex = () => {
     splitText.map((word, index) => {
       if (word.includes("~pndx~")) {
         var ndx = parseInt(word.substring(6));
@@ -485,7 +479,15 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
     });
   };
 
-  buildScripturePassage();
+ textElements=buildPassage( 
+    splitText,
+    opacity,
+    highlightedPhrases,
+    highlightedWords,
+    openExegeticalDialog,
+    openWordDialog,
+    setOpacity,
+);
 
   Image.getSize(imageURI, (imgWidth, imgHeight) => {
     const aspectRatio = imgHeight / imgWidth;
@@ -570,7 +572,9 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
         </View>
       </ScrollView>
 
-      <Portal>
+      <PhraseDialog closeExegeticalDialog={closeExegeticalDialog} exegeticalDialogNote={exegeticalDialogNote} exegeticalDialogVisible={exegeticalDialogVisible} />
+
+      {/* <Portal>
         <Dialog
           style={{ width: screenWidth - 50, maxHeight: safeAreaHeight - 25 }}
           visible={exegeticalDialogVisible}
@@ -667,7 +671,7 @@ const HBScriptureCard: React.FC<HBScriptureCard> = ({
             />
           </Dialog.Actions>
         </Dialog>
-      </Portal>
+      </Portal> */}
 
       <WordDialog
         wordDialogTitle={wordDialogTitle}

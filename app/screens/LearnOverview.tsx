@@ -1,25 +1,22 @@
 import React from "react";
-import { Platform } from "react-native";
+import { Platform, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import getAppBarProps from "@/helpers/GetAppBarProps";
 
 import { View, StyleSheet } from "react-native";
-
-import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HBAppBar from "@/components/HBAppBar";
 
-import { useAppContext } from "@/context/AppContext";
-
 import HBOverviewCard from "@/components/HBOverviewCard";
 
-const HBOverview: React.FC = ({}) => {
-  const { t } = useTranslation();
-
+const LearnOverview: React.FC = ({}) => {
   const appbarProps = getAppBarProps("learn");
 
-  const { translationStep, template, setHasRecording } = useAppContext();
+  const { width: screenWidth, height: screenHeight } = Dimensions.get("screen");
+  const insets = useSafeAreaInsets();
+  const safeAreaHeight = screenHeight - (insets.top + insets.bottom);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -29,6 +26,7 @@ const HBOverview: React.FC = ({}) => {
             flex: Platform.OS === "ios" ? 0.93 : 1,
             justifyContent: "center",
             alignItems: "center",
+            maxHeight: safeAreaHeight,
           },
         ]}
       >
@@ -39,7 +37,7 @@ const HBOverview: React.FC = ({}) => {
   );
 };
 
-export default HBOverview;
+export default LearnOverview;
 
 const styles = StyleSheet.create({
   container: {

@@ -20,6 +20,14 @@ export interface scripture {
     hasRecording: boolean;
   }
 
+  export interface ExegeticalNote {
+    av: string;
+    words: string;
+    BEN: string;
+    comment: string;
+    parallelRef: string;
+  }
+
   export interface appState {
     template: string;
     tranlationStep: string;

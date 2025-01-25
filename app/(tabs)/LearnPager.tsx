@@ -4,7 +4,7 @@ import { StyleSheet, View, Touchable } from "react-native";
 import PagerView from "react-native-pager-view";
 import Learn from "../screens/Learn";
 import { useAppContext } from "@/context/AppContext";
-import HBOverview from "./HBOverview";
+import HBOverview from "../screens/LearnOverview";
 
 const LearnPager = () => {
   const { getNumberOfSections, templatePassages, disableAudio } =

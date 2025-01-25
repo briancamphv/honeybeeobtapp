@@ -15,8 +15,11 @@ import { listFiles } from "@/helpers/FileUtilies";
 import { WordNote } from "@/interfaces/appInterfaces";
 
 import { appState, section, scripture } from "@/interfaces/appInterfaces";
+import { ExegeticalNote } from "@/interfaces/appInterfaces";
+
 
 const audioPlayer = new AudioRecorderPlayer();
+
 
 // Define the type for the context values
 
@@ -55,7 +58,7 @@ interface AppContextType {
   notes: any;
   title: string;
   bookOverview: string;
-  bookNotes: any;
+  bookNotes: ExegeticalNote[];
   templateTitle: string;
   passageOverview: string;
   passageOverviewAV: [];

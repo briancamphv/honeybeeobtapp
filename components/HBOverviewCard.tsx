@@ -9,8 +9,11 @@ import * as FileSystem from "expo-file-system";
 import HBVideo from "./HBVideo";
 import AutosizeImage from "@/helpers/AutoSizeImage";
 import AudioPlayer from "./HBAudioPlayer";
+import { ExegeticalNote } from "@/interfaces/appInterfaces";
+import PhraseDialog from "./PhraseDialog";
+import buildPassage from "@/helpers/BuildPassage";
 
-const HBOverviewCard = () => {
+const HBOverviewCard: React.FC = () => {
   const {
     bookOverview,
     bookNotes,
@@ -27,7 +30,73 @@ const HBOverviewCard = () => {
     template,
     translationStep,
     language,
+    disableAudio,
   } = useAppContext();
+
+  var tokenizedPassage: string = "";
+
+  const [exegeticalDialogVisible, setExegeticalDialogVisible] = useState(false);
+  const [highlightedPhrases, setHighlightedPhrases] = useState<any[]>([]);
+  const [highlightedPassage, setHighlightedPassage] = useState<String>("");
+
+  const [highlightedWords, setHighlightedWords] = useState<string[]>([]);
+  const [opacity, setOpacity] = useState(1);
+  const [exegeticalDialogNote, setExegeticalDialogNote] =
+    useState<ExegeticalNote>({
+      words: "",
+      BEN: "",
+      parallelRef: "",
+      comment: "",
+      av: "",
+    });
+
+  useEffect(() => {
+    if (bookNotes === null || bookNotes === undefined) {
+      var modifiedPassage = bookOverview;
+      setHighlightedPassage(modifiedPassage);
+      return;
+    }
+
+    var phrases: any[] = [];
+
+    var ndx = 0;
+
+    tokenizedPassage = bookOverview;
+
+    bookNotes.map((note, index) => {
+      tokenizedPassage = tokenizedPassage.replace(
+        note.words,
+        "<<<~pndx~" + index + "<<<"
+      );
+
+      phrases.push({
+        words: note.words,
+        index: index,
+        BEN: note.BEN,
+        parallelRef: note.parallelRef,
+        comment: note.comment,
+        av: note.av,
+      });
+    });
+
+    setHighlightedPhrases(phrases);
+
+    setHighlightedPassage(tokenizedPassage);
+  }, [bookNotes]);
+
+  const openExegeticalDialog = (ndx: number) => {
+    setExegeticalDialogVisible(true);
+
+    setExegeticalDialogNote(highlightedPhrases[ndx]);
+  };
+
+  const closeExegeticalDialog = (av: any) => {
+    setExegeticalDialogVisible(false);
+
+    if (av) {
+      disableAudio();
+    }
+  };
 
   var assetDir = FileSystem.documentDirectory + template + "/audioVisual/";
 
@@ -228,118 +297,164 @@ const HBOverviewCard = () => {
     }
   }, [template]);
 
+  const splitText = highlightedPassage.split("<<<");
+
+  const bookNotesTextElements: React.JSX.Element[] = buildPassage(
+    splitText,
+    opacity,
+    highlightedPhrases,
+    highlightedWords,
+    openExegeticalDialog,
+    () => {},
+    setOpacity
+  );
+
   return (
-    <ScrollView
-      bounces={false}
-      showsVerticalScrollIndicator={false}
-      style={styles.card}
-    >
-      <View style={styles.card}>
-        <Card mode="contained" style={{ backgroundColor: "#f0f0f0" }}>
-          <Card.Title
-            titleVariant="titleLarge"
-            title={t(templateTitle, { lng: language })}
-          />
-          <Card.Title
-            titleVariant="titleMedium"
-            title={t("Book Overview", { lng: language })}
-          />
-          <Card.Content>
-            <Text>{bookOverviewNL}</Text>
-          </Card.Content>
-          <Card.Title
-            titleVariant="titleMedium"
-            title={t("Passage Overview", { lng: language })}
-          />
-          <Card.Content>
-            <Text>{passageOverviewNL}</Text>
-          </Card.Content>
-
-          {passageOverviewVideo.map((videoURI, index) => (
-            <HBVideo key={index} videoURI={videoURI} />
-          ))}
-          {passageOverviewImages.map((imageURI, index) => (
-            <AutosizeImage
-              screenWidth={screenWidth}
-              source={{ uri: imageURI }}
+    <View>
+      <ScrollView
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ width: screenWidth }}
+        
+      >
+        <View style={styles.container}>
+          <Card mode="contained" style={{ backgroundColor: "#f0f0f0" }}>
+            <Card.Title
+              titleVariant="titleLarge"
+              title={t(templateTitle, { lng: language })}
             />
-          ))}
-          {passageOverviewAudio.map((audioURI, index) => (
-            <AudioPlayer audioUri={[audioURI]} />
-          ))}
-
-          <Card.Title
-            titleVariant="titleMedium"
-            title={t("Background Information", { lng: language })}
-          />
-          <Card.Content>
-            <Text>{backgroundInfoNL}</Text>
-          </Card.Content>
-
-          {backgroundInfoVideo.map((videoURI, index) => (
-            <HBVideo key={index} videoURI={videoURI} />
-          ))}
-          {backgroundInfoImages.map((imageURI, index) => (
-            <AutosizeImage
-              screenWidth={screenWidth}
-              source={{ uri: imageURI }}
+            <Card.Title
+              titleVariant="titleMedium"
+              title={t("Book Overview", { lng: language })}
             />
-          ))}
-          {backgroundInfoAudio.map((audioURI, index) => (
-            <AudioPlayer audioUri={[audioURI]} />
-          ))}
-
-          <Card.Title
-            titleVariant="titleMedium"
-            title={t("Historical Context", { lng: language })}
-          />
-          <Card.Content>
-            <Text>{historicalContextNL}</Text>
-          </Card.Content>
-
-          {historicalContextVideo.map((videoURI, index) => (
-            <HBVideo key={index} videoURI={videoURI} />
-          ))}
-          {historicalContextImages.map((imageURI, index) => (
-            <AutosizeImage
-              screenWidth={screenWidth}
-              source={{ uri: imageURI }}
+            <Card.Content>
+              <View>
+                <Text style={{ opacity }}>
+                  {bookNotesTextElements.map((element) => {
+                    return element;
+                  })}
+                </Text>
+              </View>
+            </Card.Content>
+            <Card.Title
+              titleVariant="titleMedium"
+              title={t("Passage Overview", { lng: language })}
             />
-          ))}
-          {historicalContextAudio.map((audioURI, index) => (
-            <AudioPlayer audioUri={[audioURI]} />
-          ))}
+            <Card.Content>
+              <Text>{passageOverviewNL}</Text>
 
-          <Card.Title
-            titleVariant="titleMedium"
-            title={t("Prominent Themes", { lng: language })}
-          />
-          <Card.Content>
-            <Text>{prominentThemesNL}</Text>
-          </Card.Content>
+              {passageOverviewVideo.map((videoURI, index) => (
+                <HBVideo key={index} videoURI={videoURI} />
+              ))}
+              {passageOverviewImages.map((imageURI, index) => (
+                <View>
+                  <Text>{"\n"}</Text>
+                  <AutosizeImage
+                    key={index}
+                    screenWidth={screenWidth - 25}
+                    source={{ uri: imageURI }}
+                  />
+                </View>
+              ))}
+              {passageOverviewAudio.map((audioURI, index) => (
+                <AudioPlayer key={index} audioUri={[audioURI]} />
+              ))}
+            </Card.Content>
 
-          {prominentThemesVideo.map((videoURI, index) => (
-            <HBVideo key={index} videoURI={videoURI} />
-          ))}
-          {prominentThemesImages.map((imageURI, index) => (
-            <AutosizeImage
-              screenWidth={screenWidth}
-              source={{ uri: imageURI }}
+            <Card.Title
+              titleVariant="titleMedium"
+              title={t("Background Information", { lng: language })}
             />
-          ))}
-          {prominentThemesAudio.map((audioURI, index) => (
-            <AudioPlayer audioUri={[audioURI]} />
-          ))}
-        </Card>
-      </View>
-    </ScrollView>
+            <Card.Content>
+              <Text>{backgroundInfoNL}</Text>
+
+              {backgroundInfoVideo.map((videoURI, index) => (
+                <HBVideo key={index} videoURI={videoURI} />
+              ))}
+              {backgroundInfoImages.map((imageURI, index) => (
+                <View>
+                  <Text>{"\n"}</Text>
+                  <AutosizeImage
+                    key={index}
+                    screenWidth={screenWidth - 25}
+                    source={{ uri: imageURI }}
+                  />
+                </View>
+              ))}
+              {backgroundInfoAudio.map((audioURI, index) => (
+                <AudioPlayer key={index} audioUri={[audioURI]} />
+              ))}
+            </Card.Content>
+
+            <Card.Title
+              titleVariant="titleMedium"
+              title={t("Historical Context", { lng: language })}
+            />
+            <Card.Content>
+              <Text>{historicalContextNL}</Text>
+
+              {historicalContextVideo.map((videoURI, index) => (
+                <HBVideo key={index} videoURI={videoURI} />
+              ))}
+              {historicalContextImages.map((imageURI, index) => (
+                <View>
+                  <Text>{"\n"}</Text>
+                  <AutosizeImage
+                    key={index}
+                    screenWidth={screenWidth - 25}
+                    source={{ uri: imageURI }}
+                  />
+                </View>
+              ))}
+              {historicalContextAudio.map((audioURI, index) => (
+                <AudioPlayer key={index} audioUri={[audioURI]} />
+              ))}
+            </Card.Content>
+
+            <Card.Title
+              titleVariant="titleMedium"
+              title={t("Prominent Themes", { lng: language })}
+            />
+            <Card.Content>
+              <Text>{prominentThemesNL}</Text>
+
+              {prominentThemesVideo.map((videoURI, index) => (
+                <HBVideo key={index} videoURI={videoURI} />
+              ))}
+              {prominentThemesImages.map((imageURI, index) => (
+                <View>
+                  <Text>{"\n"}</Text>
+                  <AutosizeImage
+                    key={index}
+                    screenWidth={screenWidth - 25}
+                    source={{ uri: imageURI }}
+                  />
+                </View>
+              ))}
+              {prominentThemesAudio.map((audioURI, index) => (
+                <AudioPlayer key={index} audioUri={[audioURI]} />
+              ))}
+            </Card.Content>
+          </Card>
+        </View>
+      </ScrollView>
+
+      <PhraseDialog
+        closeExegeticalDialog={closeExegeticalDialog}
+        exegeticalDialogNote={exegeticalDialogNote}
+        exegeticalDialogVisible={exegeticalDialogVisible}
+      />
+    </View>
   );
 };
 
 export default HBOverviewCard;
 
 const styles = StyleSheet.create({
-  card: {},
+  container: {
+    flex: 1,
+    paddingBottom: 50
+  },
 
   title: {
     backgroundColor: "red",

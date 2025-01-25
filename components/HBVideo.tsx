@@ -19,9 +19,8 @@ const HBVideo: React.FC<props> = ({ videoURI }) => {
   const videoRef = useRef<VideoView>(null);
 
   useEffect(() => {
-    const videoWidth = screenWidth - 100
-    setVideoWidth(videoWidth);
-    setVideoHeigth(videoWidth/ 1.777);
+    setVideoWidth(screenWidth - 10);
+    setVideoHeigth(screenWidth -10/ 1.777);
   }, []);
 
   const player = useVideoPlayer(videoURI, (player) => {
